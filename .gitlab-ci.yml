@@ -21,6 +21,8 @@ build:
 deploy:
   stage: deploy
   script:
+    - docker stop ragapplication_web || true
+    - docker rm ragapplication_web || true
     - |
       docker run -d \
         --name ragapplication_web \
