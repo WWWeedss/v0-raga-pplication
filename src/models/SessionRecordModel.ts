@@ -1,10 +1,10 @@
-export interface MessageItem{
-    role: 'user' | 'assistant',
-    msg: string,
+export interface Message {
+    role: 'user' | 'assistant';
+    content: string;
 }
 
 export interface SessionRecordModel{
     session_id: number,
     user_id: number,
-    session_data: MessageItem[],
+    session_data: Message[],
 }

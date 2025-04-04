@@ -17,11 +17,13 @@
       <!-- 聊天区域 -->
       <div class="flex-1 overflow-auto p-4" ref="chatContainer">
         <div class="max-w-4xl mx-auto">
-          <ChatMessage
-              v-for="(message, index) in messages"
-              :key="index"
-              :message="message"
-          />
+          <div class="flex flex-col space-y-4">
+            <ChatMessage
+                v-for="(message, index) in messages"
+                :key="index"
+                :message="message"
+            />
+          </div>
         </div>
       </div>
 
@@ -68,9 +70,18 @@ const sidebarRef = ref<null | SidebarInstance>(null)
 const chatContainer = ref<HTMLElement | null>(null)
 const newMessage = ref<string>('')
 const messages = ref<Message[]>([
-  { role: 'assistant', content: '您好！我是RAG知识库助手，有什么可以帮您的？' },
-  { role: 'user', content: '什么是RAG技术？' },
-  { role: 'assistant', content: 'RAG（Retrieval-Augmented Generation）是一种结合了检索和生成的AI技术。它通过从知识库中检索相关信息，然后利用这些信息来增强大型语言模型的回答，从而提供更准确、更新和更可靠的回复。' }
+  {
+    role: 'assistant',
+    content: '您好！我是RAG知识库助手，有什么可以帮您的？'
+  },
+  {
+    role: 'user',
+    content: '什么是RAG技术？'
+  },
+  {
+    role: 'assistant',
+    content: '# RAG技术简介\n\nRAG（**Retrieval-Augmented Generation**）是一种结合了检索和生成的AI技术。它通过从知识库中检索相关信息，然后利用这些信息来增强大型语言模型的回答，从而提供更准确、更新和更可靠的回复。\n\n## RAG的主要组成部分\n\n1. **检索系统**：负责从知识库中找到与用户查询相关的文档或信息\n2. **生成系统**：通常是大型语言模型，用于生成最终回答\n\n## RAG的优势\n\n* 减少幻觉（hallucination）问题\n* 提供最新信息\n* 可以引用信息来源\n* 更好地处理专业领域问题\n\n```python\n# RAG简单实现示例\ndef rag_system(query, knowledge_base):\n    # 1. 检索相关文档\n    relevant_docs = retrieve_documents(query, knowledge_base)\n    \n    # 2. 构建增强提示\n    enhanced_prompt = f"基于以下信息回答问题:\\n{relevant_docs}\\n\\n问题: {query}"\n    \n    # 3. 生成回答\n    answer = llm_generate(enhanced_prompt)\n    \n    return answer\n```'
+  }
 ])
 
 const toggleSidebar = (): void => {
