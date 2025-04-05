@@ -1,9 +1,7 @@
 <template>
   <div class="flex mb-4" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
     <div class="flex"
-         :class="[
-           message.role === 'user' ? 'flex-row-reverse max-w-[50%]' : 'w-full',
-         ]">
+         :class="message.role === 'user' ? 'flex-row-reverse' : ''">
       <div class="flex-shrink-0 h-8 w-8 rounded-full overflow-hidden flex items-center justify-center"
            :class="message.role === 'user' ? 'ml-2' : 'mr-2'">
         <div v-if="message.role === 'user'" class="bg-purple-600 h-full w-full flex items-center justify-center">
@@ -15,8 +13,12 @@
       </div>
 
       <div class="p-3 rounded-lg"
-           :class="message.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-white'">
-        <div v-if="message.role === 'user'" class="whitespace-pre-wrap">{{ message.content }}</div>
+           :class="[
+             message.role === 'user'
+               ? 'bg-purple-600 text-white max-w-[calc(50vw-40px)]'
+               : 'bg-gray-800 text-white'
+           ]">
+        <div v-if="message.role === 'user'" class="whitespace-pre-wrap break-words">{{ message.content }}</div>
         <div v-else class="markdown-body" v-html="renderedContent"></div>
       </div>
     </div>
