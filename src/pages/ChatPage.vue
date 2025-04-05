@@ -67,12 +67,7 @@ import Sidebar from '../components/chatpage-components/Sidebar.vue'
 import ChatMessage from '../components/chatpage-components/ChatMessage.vue'
 import UserAvatar from '../components/chatpage-components/UserAvatar.vue'
 import TypingIndicator from '../components/chatpage-components/TypingIndicator.vue'
-
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import type { Message } from '../models/SessionRecordModel.ts'
 
 interface SidebarInstance {
   toggleSidebar: () => void;
