@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, onMounted, inject} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import { useRouter } from 'vue-router'
 import { Lock } from 'lucide-vue-next'
 import type { UserModel } from '../models/UserModel'

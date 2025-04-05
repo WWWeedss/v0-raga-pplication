@@ -29,7 +29,7 @@ const router = createRouter({
 })
 
 // 导航守卫，使用 API 调用检查用户是否已登录
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from , next) => {
     // 获取全局状态
     const globalState = inject('globalState') as { isAuthenticating: boolean }
 
