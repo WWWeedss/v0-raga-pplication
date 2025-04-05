@@ -14,10 +14,10 @@
         </div>
       </div>
 
-      <div class="p-3 rounded-lg markdown-body"
+      <div class="p-3 rounded-lg"
            :class="message.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-white'">
-        <div v-if="message.role === 'user'">{{ message.content }}</div>
-        <div v-else v-html="renderedContent"></div>
+        <div v-if="message.role === 'user'" class="whitespace-pre-wrap">{{ message.content }}</div>
+        <div v-else class="markdown-body" v-html="renderedContent"></div>
       </div>
     </div>
   </div>

@@ -29,22 +29,25 @@
       <!-- 输入区域 -->
       <div class="p-4 border-t border-gray-700 bg-gray-800">
         <div class="max-w-4xl mx-auto">
-          <form @submit.prevent="sendMessage" class="flex">
-            <input
+          <form @submit.prevent="sendMessage" class="relative">
+            <textarea
                 v-model="newMessage"
-                type="text"
-                placeholder="输入您的问题..."
-                class="flex-1 p-2 bg-gray-700 border border-gray-600 rounded-l-md text-white placeholder-gray-400 focus:outline-none  focus:border-transparent"
+                placeholder="输入您的问题... (Shift+Enter 换行, Enter 发送)"
+                class="w-full p-3 pr-12 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-transparent resize-none overflow-hidden"
                 :disabled="isLoading"
-            />
+                @keydown="handleKeyDown"
+                ref="textareaRef"
+                rows="1"
+            ></textarea>
+
             <button
                 type="submit"
-                class="bg-purple-600 text-white px-4 py-2 rounded-r-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                class="absolute right-2 bottom-4 p-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:pointer-events-none transition-colors"
                 :disabled="isLoading || !newMessage.trim()"
             >
-              <Send v-if="!isLoading" class="h-5 w-5" />
-              <div v-else class="h-5 w-5 flex items-center justify-center">
-                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <Send v-if="!isLoading" class="h-4 w-4" />
+              <div v-else class="h-4 w-4 flex items-center justify-center">
+                <svg class="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -58,12 +61,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { Menu, Send } from 'lucide-vue-next'
 import Sidebar from '../components/chatpage-components/Sidebar.vue'
 import ChatMessage from '../components/chatpage-components/ChatMessage.vue'
 import UserAvatar from '../components/chatpage-components/UserAvatar.vue'
 import TypingIndicator from '../components/chatpage-components/TypingIndicator.vue'
+
 
 interface Message {
   role: 'user' | 'assistant';
@@ -76,8 +80,10 @@ interface SidebarInstance {
 
 const sidebarRef = ref<null | SidebarInstance>(null)
 const chatContainer = ref<HTMLElement | null>(null)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const newMessage = ref<string>('')
 const isLoading = ref<boolean>(false)
+const showHint = ref<boolean>(false)
 const messages = ref<Message[]>([
   {
     role: 'assistant',
@@ -93,6 +99,36 @@ const messages = ref<Message[]>([
   }
 ])
 
+// 自动调整文本区域高度
+const adjustTextareaHeight = (): void => {
+  if (textareaRef.value) {
+    textareaRef.value.style.height = 'auto'
+    textareaRef.value.style.height = `${textareaRef.value.scrollHeight}px`
+  }
+}
+
+// 监听消息内容变化，自动调整高度
+watch(newMessage, () => {
+  nextTick(() => {
+    adjustTextareaHeight()
+  })
+})
+
+// 处理键盘事件
+const handleKeyDown = (e: KeyboardEvent): void => {
+  // 如果按下Enter键且没有按下Shift键
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault() // 阻止默认的换行行为
+    sendMessage() // 发送消息
+  }
+
+  // 显示提示
+  showHint.value = true
+  setTimeout(() => {
+    showHint.value = false
+  }, 3000)
+}
+
 const toggleSidebar = (): void => {
   if (sidebarRef.value) {
     sidebarRef.value.toggleSidebar()
@@ -102,10 +138,15 @@ const toggleSidebar = (): void => {
 const sendMessage = async (): Promise<void> => {
   if (!newMessage.value.trim() || isLoading.value) return
 
-  // 添加用户消息
+  // 添加用户消息 - 不需要修改，Vue 会保留换行符
   const userMessage = newMessage.value
   messages.value.push({ role: 'user', content: userMessage })
   newMessage.value = ''
+
+  // 重置文本区域高度
+  if (textareaRef.value) {
+    textareaRef.value.style.height = 'auto'
+  }
 
   // 滚动到底部
   await nextTick()
@@ -153,5 +194,16 @@ onMounted((): void => {
   if (chatContainer.value) {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   }
+
+  // 初始化文本区域高度
+  adjustTextareaHeight()
 })
 </script>
+
+<style scoped>
+textarea {
+  min-height: 44px;
+  max-height: 200px;
+  white-space: pre-wrap; /* 保留换行符 */
+}
+</style>
