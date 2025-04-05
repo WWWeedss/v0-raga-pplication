@@ -28,40 +28,52 @@ const router = createRouter({
     routes
 })
 
+// 判断是否登录过的函数
+const isLoggedIn = () => {
+    const userData = localStorage.getItem('userData')
+    const lastLoginTime = localStorage.getItem('lastLoginTime')
+    if (userData && lastLoginTime) {
+        const timeDiff = new Date().getTime() - new Date(lastLoginTime).getTime()
+        // 判断是否在 24 小时内登录过
+        if (timeDiff <= 24 * 60 * 60 * 1000) {
+            return true
+        }
+    }
+    return false
+}
+
 // 导航守卫，使用 API 调用检查用户是否已登录
-router.beforeEach(async (to, _from , next) => {
-    // 获取全局状态
+router.beforeEach(async (to, _from, next) => {
     const globalState = inject('globalState') as { isAuthenticating: boolean }
 
-    // 如果 globalState 存在，显示加载状态
     if (globalState) {
         globalState.isAuthenticating = true
     }
 
-    // 检查路由是否需要认证
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        try {
-            const response = await getCurrentUser()
-
-            if (response.data.code === 200) {
-                next() // 允许访问需要认证的路由
-            } else {
-                next('/login') // 未登录，重定向到登录页
+        if (isLoggedIn()) {
+            // 如果本地数据存在，且用户上一次登录在 24 小时内，直接进入 chat 页面
+            next()
+        } else {
+            try {
+                const response = await getCurrentUser()
+                if (response.status === 200) {
+                    // 登录成功，保存用户数据和登录时间到 localStorage
+                    localStorage.setItem('userData', JSON.stringify(response.data))
+                    localStorage.setItem('lastLoginTime', new Date().toISOString())
+                    next() // 允许访问需要认证的路由
+                } else {
+                    next('/login') // 未登录，重定向到登录页
+                }
+            } catch (error) {
+                console.error('验证用户登录状态失败:', error)
+                next('/login')
             }
-        } catch (error) {
-            console.error('验证用户登录状态失败:', error)
-            next('/login')
         }
     } else if (to.path === '/login') {
-        try {
-            const response = await getCurrentUser()
-
-            if (response.data.code === 200) {
-                next('/chat')
-            } else {
-                next() // 允许访问登录页
-            }
-        } catch (error) {
+        if (isLoggedIn()) {
+            next('/chat') // 如果已经登录，直接跳转到 chat 页面
+        } else {
             next() // 允许访问登录页
         }
     } else {

@@ -13,6 +13,10 @@ export function login(user: UserModel) {
     return axios.post(`${BASE_URL}/login`, user)
 }
 
+export function logout() {
+    return axios.post(`${BASE_URL}/logout`)
+}
+
 export function getCurrentUser() {
     return axios.get(`${BASE_URL}/getCurrentUser`)
 }
