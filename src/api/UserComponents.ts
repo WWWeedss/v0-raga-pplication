@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 import type { UserModel } from '../models/UserModel';
-import {CURRENT_ENVIRONMENT, USER_MODULE} from "./ComponentPrefix.ts";
+import {USER_MODULE} from "./ComponentPrefix.ts";
+import {CURRENT_ENVIRONMENT} from "./EnvironmentPrefix.ts";
 
 const BASE_URL = CURRENT_ENVIRONMENT + USER_MODULE;
 

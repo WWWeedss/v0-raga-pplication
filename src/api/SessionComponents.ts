@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { SessionRecordModel } from "../models/SessionRecordModel.ts";
-import {CURRENT_ENVIRONMENT, SESSION_MODULE} from "./ComponentPrefix.ts";
+import {SESSION_MODULE} from "./ComponentPrefix.ts";
+import {CURRENT_ENVIRONMENT} from "./EnvironmentPrefix.ts";
 
 const BASE_URL = CURRENT_ENVIRONMENT + SESSION_MODULE;
 
