@@ -55,10 +55,6 @@ const props = defineProps<{
   isUser: boolean;
 }>();
 
-const emit = defineEmits<{
-  (e: 'showReferences', references: source_document[]): void;
-}>();
-
 const md = new MarkdownIt();
 
 const renderedContent = computed(() => {
