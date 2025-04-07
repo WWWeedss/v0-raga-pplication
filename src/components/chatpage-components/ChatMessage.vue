@@ -15,13 +15,13 @@
     ]">
       <!-- 引用计数器 -->
       <div
-          v-if="!isUser && message.sourceDocuments && message.sourceDocuments.length > 0"
-          @click="$emit('showReferences', message.sourceDocuments)"
+          v-if="!isUser && message.source_documents && message.source_documents.length > 0"
+          @click="$emit('showReferences', message.source_documents)"
           class="inline-block bg-gray-700 text-xs text-white px-2 py-1 rounded-full mb-2 cursor-pointer hover:bg-gray-600 transition-colors"
       >
         <div class="flex items-center">
           <FileText class="h-3 w-3 mr-1" />
-          {{ message.sourceDocuments.length }} 条引用
+          {{ message.source_documents.length }} 条引用
         </div>
       </div>
 
@@ -42,16 +42,10 @@
 import { computed } from 'vue';
 import MarkdownIt from 'markdown-it';
 import { FileText, User, Bot } from 'lucide-vue-next';
-import type { source_document } from "../../models/LLMResponseModels.ts";
-
-interface MessageType {
-  content: string;
-  isUser: boolean;
-  sourceDocuments?: source_document[];
-}
+import type {MessageItem} from "../../models/SessionRecordModel.ts";
 
 const props = defineProps<{
-  message: MessageType;
+  message: MessageItem;
   isUser: boolean;
 }>();
 

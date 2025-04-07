@@ -5,7 +5,37 @@ import {CURRENT_ENVIRONMENT} from "./EnvironmentPrefix.ts";
 
 const BASE_URL = CURRENT_ENVIRONMENT + SESSION_MODULE;
 
-export function getSessionRecordById(sessionId: number) {
-    return axios.get<SessionRecordModel>(`${BASE_URL}/${sessionId}`);
+export async function createSessionRecord(sessionData: SessionRecordModel): Promise<SessionRecordModel> {
+    return axios.post(`${BASE_URL}/createSessionRecord`, sessionData).then(
+        (response) => {
+            return response.data as SessionRecordModel;
+        }
+    ).catch((error) => {
+        console.error("Error in createSessionRecord:", error);
+        throw error;
+    });
 }
+
+export async function getSessionRecordByUserId(userId: number | undefined):Promise<SessionRecordModel[]> {
+    return axios.get<SessionRecordModel[]>(`${BASE_URL}/getSessionRecordsByUser/${userId}`).then(
+        (response) => {
+            return response.data as SessionRecordModel[];
+        }
+    ).catch((error) => {
+        console.error("Error in getSessionRecordByUserId:", error);
+        throw error;
+    });
+}
+
+export async function updateSingleSessionRecord(sessionData: SessionRecordModel) {
+    return axios.put(`${BASE_URL}/updateSingleSessionRecord`, sessionData).then(
+        (response) => {
+            return response.data;
+        }
+    ).catch((error) => {
+        console.error("Error in updateSingleSessionRecord:", error);
+        throw error;
+    });
+}
+
 

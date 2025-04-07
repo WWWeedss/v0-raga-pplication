@@ -15,7 +15,7 @@
     <!-- 上半部分：功能区 -->
     <div class="flex-none p-4" :class="{ 'hidden': collapsed }">
       <div class="space-y-4">
-        <div class="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer">
+        <div class="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer" @click="newChat">
           <MessageSquare class="h-4 w-4 mr-2" />
           <span>新建对话</span>
         </div>
@@ -33,10 +33,27 @@
       <h2 class="text-sm font-semibold text-gray-400 uppercase px-4 py-2 flex-none border-t border-gray-700">对话历史</h2>
       <div class="flex-1 overflow-y-auto px-4 pb-4">
         <div class="space-y-2">
-          <div v-for="(chat, index) in chats" :key="index"
-               class="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer">
-            <MessageSquare class="h-4 w-4 mr-2 flex-shrink-0" />
-            <span class="truncate">{{ chat.title }}</span>
+          <div
+              v-for="(session_item, index) in sessionStore.sessions"
+              :key="index"
+              @click="selectChat(index)"
+              :class="[
+              'flex items-center p-2 rounded cursor-pointer transition-all duration-200',
+              sessionStore.currentSessionIndex === index
+                ? 'bg-purple-900/50 border-l-4 border-purple-500 pl-1'
+                : 'hover:bg-gray-800 border-l-4 border-transparent pl-1'
+            ]"
+          >
+            <MessageSquare
+                class="h-4 w-4 mr-2 flex-shrink-0"
+                :class="sessionStore.currentSessionIndex === index ? 'text-purple-400' : ''"
+            />
+            <span
+                class="truncate"
+                :class="sessionStore.currentSessionIndex === index ? 'font-medium text-purple-200' : ''"
+            >
+              {{ session_item.session_data[0].content.slice(0, 20) }}{{ session_item.session_data[0].content.length > 20 ? '...' : '' }}
+            </span>
           </div>
         </div>
       </div>
@@ -44,7 +61,7 @@
 
     <!-- 折叠状态下的图标菜单 -->
     <div v-if="collapsed" class="flex flex-col items-center mt-4 space-y-4 flex-1">
-      <button class="p-2 rounded hover:bg-gray-800">
+      <button class="p-2 rounded hover:bg-gray-800" @click="newChat">
         <MessageSquare class="h-5 w-5" />
       </button>
       <button class="p-2 rounded hover:bg-gray-800">
@@ -55,32 +72,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, MessageSquare, Settings } from 'lucide-vue-next'
+import { useSessionStore } from "../../stores/sessionStore.ts";
 
-interface Chat {
-  title: string;
-}
-
+const sessionStore = useSessionStore()
 const collapsed = ref<boolean>(false)
-const chats = ref<Chat[]>([
-  { title: '如何使用RAG应用？' },
-  { title: '文档检索示例' },
-  { title: '知识库问答' },
-  { title: 'mock1' },
-  { title: 'mock2' },
-  { title: 'mock3' },
-  { title: 'mock4' },
-  { title: 'mock5' },
-  { title: 'mock6' },
-  { title: 'mock7' },
-  { title: 'mock8' },
-  { title: 'mock9' },
-  { title: 'mock10' }
-])
+
+// 在组件挂载时获取会话列表
+onMounted(async () => {
+  await sessionStore.fetchSessions();
+});
 
 const toggleSidebar = (): void => {
   collapsed.value = !collapsed.value
+}
+
+const emit = defineEmits(['selectChat', 'newChat'])
+
+const selectChat = (index: number): void => {
+  sessionStore.setCurrentSessionIndex(index);
+  emit('selectChat')
+}
+
+const newChat = (): void => {
+  sessionStore.setCurrentSessionIndex(-1);
+  emit('newChat')
 }
 
 defineExpose({
@@ -93,6 +110,10 @@ defineExpose({
 /* 确保滚动条样式与深色主题匹配 */
 ::-webkit-scrollbar {
   width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937; /* bg-gray-800 */
 }
 
 ::-webkit-scrollbar-thumb {

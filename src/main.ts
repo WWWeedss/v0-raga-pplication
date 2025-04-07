@@ -5,6 +5,7 @@ import "tailwindcss/tailwind.css"
 import router from './router/index.ts'
 import axios from "axios";
 import type { UserModel } from "./models/UserModel.ts";
+import {createPinia} from "pinia";
 
 // 配置 axios
 axios.defaults.withCredentials = true // 确保跨域请求发送 cookies
@@ -19,6 +20,8 @@ const globalState = reactive({
 // 设置 userData 的初始值
 const userData = reactive<UserModel>(JSON.parse(localStorage.getItem('userData') || '{}'))
 
+
+
 // 设置路由
 app.use(router)
 
@@ -26,5 +29,7 @@ app.use(router)
 app.provide('userData', userData)
 app.provide('globalState', globalState)
 
-// 设置路由
+const pinia = createPinia()
+app.use(pinia)
+
 app.mount('#app')

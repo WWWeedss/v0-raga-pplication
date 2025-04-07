@@ -11,3 +11,9 @@ export interface LLMResponse {
     answer: string;
     source_documents: source_document[];
 }
+
+export interface Message {
+    content: string;
+    isUser: boolean;
+    source_documents?: source_document[];
+}

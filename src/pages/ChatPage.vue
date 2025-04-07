@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen overflow-hidden">
     <!-- 侧边栏 -->
-    <Sidebar ref="sidebarRef" />
+    <Sidebar ref="sidebarRef" @selectChat="handleSelectChat" @newChat="handleNewChat"/>
 
     <!-- 主内容区 -->
     <div class="flex-1 flex flex-col bg-gray-800 relative">
@@ -24,7 +24,7 @@
               v-for="(message, index) in messages"
               :key="index"
               :message="message"
-              :isUser="message.isUser"
+              :isUser="message.role === 'user'"
               @showReferences="showReferences"
           />
           <TypingIndicator v-if="isLoading" />
@@ -71,38 +71,23 @@ import ChatMessage from '../components/chatpage-components/ChatMessage.vue';
 import TypingIndicator from '../components/chatpage-components/TypingIndicator.vue';
 import ReferencesSidebar from '../components/chatpage-components/ReferencesSidebar.vue';
 import UserAvatar from '../components/chatpage-components/UserAvatar.vue';
-import {ragQuery} from "../api/LLMcomponents.ts";
+import {ragQueryWithHistory} from "../api/LLMcomponents.ts";
+import type{source_document, LLMResponse} from "../models/LLMResponseModels.ts";
+import type {MessageItem, SessionRecordModel} from "../models/SessionRecordModel.ts";
+import {useSessionStore} from "../stores/sessionStore.ts";
+import type {UserModel} from "../models/UserModel.ts";
 
-interface SourceDocument {
-  content: string;
-  metadata: {
-    query: string;
-    response: string;
-  };
-  score: number;
-}
-
-interface LLMResponse {
-  answer: string;
-  source_documents: SourceDocument[];
-}
-
-interface Message {
-  content: string;
-  isUser: boolean;
-  sourceDocuments?: SourceDocument[];
-}
 
 const sidebarRef = ref<InstanceType<typeof Sidebar> | null>(null);
 const chatContainer = ref<HTMLElement | null>(null);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const userInput = ref<string>('');
-const messages = ref<Message[]>([]);
+const messages = ref<MessageItem[]>([]);
 const isLoading = ref<boolean>(false);
 
 // 引用边栏状态
 const isReferencesSidebarOpen = ref<boolean>(false);
-const currentReferences = ref<SourceDocument[]>([]);
+const currentReferences = ref<source_document[]>([]);
 const scrollToBottom = async (): Promise<void> => {
   await nextTick();
   if (chatContainer.value) {
@@ -125,12 +110,40 @@ const autoResize = (): void => {
   }
 };
 
+const sessionStore = useSessionStore();
+const userData:UserModel = JSON.parse(localStorage.getItem('userData') || '{}')
+
+onMounted(async () => {
+  // 获取当前会话
+  const currentSession = sessionStore.getCurrentSession();
+  if (currentSession) {
+    messages.value = currentSession.session_data;
+  } else {
+    messages.value = [];
+  }
+  await scrollToBottom();
+});
+
+const handleSelectChat = async (): Promise<void> => {
+  const session = sessionStore.getCurrentSession();
+  if (session) {
+    messages.value = session.session_data;
+    await scrollToBottom();
+  }
+};
+
+const handleNewChat = () => {
+  messages.value = [];
+  userInput.value = '';
+};
+
 const sendMessage = async (): Promise<void> => {
   if (isLoading.value || !userInput.value.trim()) return;
 
-  const userMessage: Message = {
+  const userMessage: MessageItem = {
     content: userInput.value,
-    isUser: true
+    role: "user",
+    source_documents: []
   };
 
   messages.value.push(userMessage);
@@ -146,21 +159,39 @@ const sendMessage = async (): Promise<void> => {
   isLoading.value = true;
 
   try {
-    // 假设这是您的API调用
-    const data: LLMResponse = await ragQuery(userMessage.content);
+    const data: LLMResponse = await ragQueryWithHistory(messages.value);
 
-    const botMessage: Message = {
+    const botMessage: MessageItem = {
       content: data.answer,
-      isUser: false,
-      sourceDocuments: data.source_documents
+      role: "assistant",
+      source_documents: data.source_documents
     };
 
     messages.value.push(botMessage);
+
+    if(messages.value.length == 2){
+      // 第一次问答成功，新建会话
+      const sessionData:SessionRecordModel = {
+        user_id: userData.user_id,
+        session_data: messages.value,
+      }
+
+      await sessionStore.addSession(sessionData);
+    }
+    else{
+      // 非第一次问答，更新会话
+      const curSession = sessionStore.getCurrentSession();
+      if (curSession) {
+        curSession.session_data = messages.value;
+        await sessionStore.updateSession(curSession);
+      }
+    }
   } catch (error) {
     console.error('Error fetching response:', error);
     messages.value.push({
       content: '抱歉，发生了错误，请稍后再试。',
-      isUser: false
+      role: "assistant",
+      source_documents: []
     });
   } finally {
     isLoading.value = false;
@@ -168,7 +199,7 @@ const sendMessage = async (): Promise<void> => {
   }
 };
 
-const showReferences = (references: SourceDocument[]): void => {
+const showReferences = (references: source_document[]): void => {
   currentReferences.value = references;
   isReferencesSidebarOpen.value = true;
 };

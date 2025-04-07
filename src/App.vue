@@ -5,9 +5,16 @@
 
 <script setup lang="ts">
 import LoadingPage from './pages/LoadingPage.vue'
-import {inject} from "vue";
+import {inject, onMounted} from "vue";
+import {useSessionStore} from "./stores/sessionStore.ts";
 
 const globalState = inject('globalState') as { isAuthenticating: boolean }
+
+const sessionStore = useSessionStore();
+
+onMounted(async ()=> {
+  await sessionStore.fetchSessions();
+});
 </script>
 
 <style>
