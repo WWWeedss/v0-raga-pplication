@@ -7,9 +7,9 @@ import type {MessageItem} from "../models/SessionRecordModel.ts";
 
 const BASE_URL = CURRENT_ENVIRONMENT + QUERY_MODULE;
 
-const global_top_k = localStorage.getItem('top_k')? parseInt(localStorage.getItem('top_k') as string) : 3;
 
-export async function ragQuery(query_str: string, top_k: number = global_top_k): Promise<LLMResponse> {
+export async function ragQuery(query_str: string): Promise<LLMResponse> {
+    const top_k = localStorage.getItem('top_k')? parseInt(localStorage.getItem('top_k') as string) : 3;
     return axios.post(`${BASE_URL}/ragQuery`, {
         query_str: query_str,
         top_k: top_k
@@ -21,7 +21,8 @@ export async function ragQuery(query_str: string, top_k: number = global_top_k):
     });
 }
 
-export async function ragQueryWithHistory(chatHistory: MessageItem[], top_k: number = global_top_k): Promise<LLMResponse> {
+export async function ragQueryWithHistory(chatHistory: MessageItem[]): Promise<LLMResponse> {
+    const top_k = localStorage.getItem('top_k')? parseInt(localStorage.getItem('top_k') as string) : 3;
     return axios.post(`${BASE_URL}/ragQueryWithHistory`, {
         chat_history: chatHistory,
         top_k: top_k

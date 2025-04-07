@@ -21,7 +21,10 @@
         </div>
       </div>
       <div class="space-y-4 mt-4">
-        <div class="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer">
+        <div
+            class="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer"
+            @click="openSettings"
+        >
           <Settings class="h-4 w-4 mr-2" />
           <span>系统设置</span>
         </div>
@@ -64,10 +67,13 @@
       <button class="p-2 rounded hover:bg-gray-800" @click="newChat">
         <MessageSquare class="h-5 w-5" />
       </button>
-      <button class="p-2 rounded hover:bg-gray-800">
+      <button class="p-2 rounded hover:bg-gray-800" @click="openSettings">
         <Settings class="h-5 w-5" />
       </button>
     </div>
+
+    <!-- 设置弹窗 -->
+    <SettingsModal :isOpen="isSettingsOpen" @close="closeSettings" />
   </div>
 </template>
 
@@ -75,9 +81,11 @@
 import { ref, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, MessageSquare, Settings } from 'lucide-vue-next'
 import { useSessionStore } from "../../stores/sessionStore.ts";
+import SettingsModal from './SettingsModal.vue';
 
 const sessionStore = useSessionStore()
 const collapsed = ref<boolean>(false)
+const isSettingsOpen = ref<boolean>(false)
 
 // 在组件挂载时获取会话列表
 onMounted(async () => {
@@ -98,6 +106,16 @@ const selectChat = (index: number): void => {
 const newChat = (): void => {
   sessionStore.setCurrentSessionIndex(-1);
   emit('newChat')
+}
+
+// 打开设置弹窗
+const openSettings = (): void => {
+  isSettingsOpen.value = true;
+}
+
+// 关闭设置弹窗
+const closeSettings = (): void => {
+  isSettingsOpen.value = false;
 }
 
 defineExpose({
