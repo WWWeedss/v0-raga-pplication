@@ -1,10 +1,10 @@
 <template>
-  <div class="relative">
+  <div class="relative text-white">
     <button @click="isOpen = !isOpen" class="flex items-center space-x-2 hover:bg-gray-700">
       <div class="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center text-white">
         <User class="h-4 w-4" />
       </div>
-      <span class="hidden md:inline text-white">{{ userData.username }}</span>
+      <span class="hidden md:inline">{{ userData.username }}</span>
       <ChevronDown class="h-4 w-4" />
     </button>
 

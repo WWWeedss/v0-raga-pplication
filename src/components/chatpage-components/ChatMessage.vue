@@ -10,7 +10,7 @@
     </div>
 
     <div :class="[
-      'p-4',
+      'p-4 break-words',
       isUser ? 'bg-purple-600 text-white max-w-[50%] rounded-lg' : 'text-white max-w-full bg-gray-800'
     ]">
       <!-- 引用计数器 -->
@@ -26,8 +26,8 @@
       </div>
 
       <!-- 消息内容 -->
-      <div v-if="isUser" class="whitespace-pre-wrap">{{ message.content }}</div>
-      <div v-else v-html="renderedContent" class="markdown-body"></div>
+      <div v-if="isUser" class="whitespace-pre-wrap break-words overflow-hidden">{{ message.content }}</div>
+      <div v-else v-html="renderedContent" class="markdown-body break-words overflow-hidden"></div>
     </div>
 
     <div v-if="isUser" class="flex-shrink-0 ml-4">
@@ -53,6 +53,10 @@ interface MessageType {
 const props = defineProps<{
   message: MessageType;
   isUser: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'showReferences', references: source_document[]): void;
 }>();
 
 const md = new MarkdownIt();
@@ -93,6 +97,9 @@ const renderedContent = computed(() => {
 
 .markdown-body p {
   margin-bottom: 1em;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .markdown-body ul,
@@ -110,6 +117,7 @@ const renderedContent = computed(() => {
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: monospace;
+  word-break: break-all;
 }
 
 .markdown-body pre {
@@ -123,11 +131,13 @@ const renderedContent = computed(() => {
 .markdown-body pre code {
   background-color: transparent;
   padding: 0;
+  word-break: normal;
 }
 
 .markdown-body a {
   color: #a78bfa;
   text-decoration: none;
+  word-break: break-all;
 }
 
 .markdown-body a:hover {
@@ -151,9 +161,18 @@ const renderedContent = computed(() => {
 .markdown-body td {
   border: 1px solid #4b5563;
   padding: 0.5em;
+  word-break: break-word;
 }
 
 .markdown-body th {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 确保长文本能够正确换行 */
+.break-words {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 </style>

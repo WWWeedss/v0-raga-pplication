@@ -39,7 +39,7 @@
               v-model="userInput"
               @keydown="handleKeyDown"
               @input="autoResize"
-              placeholder="输入您的问题..."
+              placeholder="输入您的问题...shift+enter换行，enter发送"
               class="w-full bg-gray-700 text-white rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none min-h-[44px] max-h-[150px] overflow-y-auto"
               rows="1"
           ></textarea>
