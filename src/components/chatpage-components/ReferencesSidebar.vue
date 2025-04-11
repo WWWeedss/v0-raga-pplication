@@ -27,15 +27,13 @@
               <span class="text-gray-400 text-xs">相关度: {{ (reference.score * 100).toFixed(1) }}%</span>
             </div>
 
-            <div class="text-white text-sm mb-3 whitespace-pre-wrap">{{ reference.content }}</div>
-
             <div class="bg-gray-800 p-3 rounded-md mt-2 border border-gray-700">
-              <div class="text-xs text-gray-400 mb-1">查询</div>
+              <div class="text-xs text-gray-400 mb-1">提问</div>
               <div class="text-sm text-gray-300">{{ reference.metadata.query }}</div>
             </div>
 
             <div class="bg-gray-800 p-3 rounded-md mt-2 border border-gray-700">
-              <div class="text-xs text-gray-400 mb-1">响应</div>
+              <div class="text-xs text-gray-400 mb-1">回答</div>
               <div class="text-sm text-gray-300">{{ reference.metadata.response }}</div>
             </div>
           </div>
