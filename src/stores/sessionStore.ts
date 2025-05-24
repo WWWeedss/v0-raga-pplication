@@ -2,7 +2,12 @@
 import { defineStore } from 'pinia';
 
 import type {SessionRecordModel} from "../models/SessionRecordModel.ts";
-import {createSessionRecord, getSessionRecordByUserId, updateSingleSessionRecord} from "../api/SessionComponents.ts";
+import {
+    createSessionRecord,
+    deleteSingleSessionRecord,
+    getSessionRecordByUserId,
+    updateSingleSessionRecord
+} from "../api/SessionComponents.ts";
 import type {UserModel} from "../models/UserModel.ts";
 
 const userData:UserModel = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -40,6 +45,25 @@ export const useSessionStore = defineStore('session', {
             this.sessions[this.currentSessionIndex] = session;
             // 调用远程接口更新会话记录
             await updateSingleSessionRecord(session);
+        },
+        // 删除会话记录
+        async deleteSession(index: number): Promise<void> {
+            const session = this.sessions[index];
+            if (session && session.session_id) {
+                // 调用远程接口删除会话记录
+                await deleteSingleSessionRecord(session.session_id);
+                // 从本地数组中移除
+                this.sessions.splice(index, 1);
+
+                // 调整当前选中的会话索引
+                if (this.currentSessionIndex === index) {
+                    // 如果删除的是当前选中的会话，重置为 -1
+                    this.currentSessionIndex = -1;
+                } else if (this.currentSessionIndex > index) {
+                    // 如果删除的会话在当前选中会话之前，索引需要减1
+                    this.currentSessionIndex--;
+                }
+            }
         },
     },
 });

@@ -38,25 +38,36 @@
         <div class="space-y-2">
           <div
               v-for="(session_item, index) in sessionStore.sessions"
-              :key="index"
-              @click="selectChat(index)"
+              :key="session_item.session_id"
               :class="[
-              'flex items-center p-2 rounded cursor-pointer transition-all duration-200',
+              'group flex items-center p-2 rounded cursor-pointer transition-all duration-200 relative',
               sessionStore.currentSessionIndex === index
                 ? 'bg-purple-900/50 border-l-4 border-purple-500 pl-1'
                 : 'hover:bg-gray-800 border-l-4 border-transparent pl-1'
             ]"
           >
-            <MessageSquare
-                class="h-4 w-4 mr-2 flex-shrink-0"
-                :class="sessionStore.currentSessionIndex === index ? 'text-purple-400' : ''"
-            />
-            <span
-                class="truncate"
-                :class="sessionStore.currentSessionIndex === index ? 'font-medium text-purple-200' : ''"
+            <!-- 会话内容区域 -->
+            <div class="flex items-center flex-1 min-w-0" @click="selectChat(index)">
+              <MessageSquare
+                  class="h-4 w-4 mr-2 flex-shrink-0"
+                  :class="sessionStore.currentSessionIndex === index ? 'text-purple-400' : ''"
+              />
+              <span
+                  class="truncate"
+                  :class="sessionStore.currentSessionIndex === index ? 'font-medium text-purple-200' : ''"
+              >
+                {{ session_item.session_data[0].content.slice(0, 20) }}{{ session_item.session_data[0].content.length > 20 ? '...' : '' }}
+              </span>
+            </div>
+
+            <!-- 删除按钮 -->
+            <button
+                @click.stop="deleteSession(index)"
+                class="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-red-600 transition-all duration-200 flex-shrink-0"
+                title="删除会话"
             >
-              {{ session_item.session_data[0].content.slice(0, 20) }}{{ session_item.session_data[0].content.length > 20 ? '...' : '' }}
-            </span>
+              <Trash2 class="h-3 w-3 text-gray-400 hover:text-white" />
+            </button>
           </div>
         </div>
       </div>
@@ -79,7 +90,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { ChevronLeft, ChevronRight, MessageSquare, Settings } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, MessageSquare, Settings, Trash2 } from 'lucide-vue-next'
 import { useSessionStore } from "../../stores/sessionStore.ts";
 import SettingsModal from './SettingsModal.vue';
 
@@ -96,7 +107,7 @@ const toggleSidebar = (): void => {
   collapsed.value = !collapsed.value
 }
 
-const emit = defineEmits(['selectChat', 'newChat'])
+const emit = defineEmits(['selectChat', 'newChat', 'sessionDeleted'])
 
 const selectChat = (index: number): void => {
   sessionStore.setCurrentSessionIndex(index);
@@ -106,6 +117,20 @@ const selectChat = (index: number): void => {
 const newChat = (): void => {
   sessionStore.setCurrentSessionIndex(-1);
   emit('newChat')
+}
+
+// 删除会话
+const deleteSession = async (index: number): Promise<void> => {
+  try {
+    await sessionStore.deleteSession(index);
+    // 如果删除的是当前选中的会话，通知父组件
+    if (sessionStore.currentSessionIndex === -1) {
+      emit('sessionDeleted');
+    }
+  } catch (error) {
+    console.error('删除会话失败:', error);
+    // 这里可以添加错误提示
+  }
 }
 
 // 打开设置弹窗
@@ -128,10 +153,6 @@ defineExpose({
 /* 确保滚动条样式与深色主题匹配 */
 ::-webkit-scrollbar {
   width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1f2937; /* bg-gray-800 */
 }
 
 ::-webkit-scrollbar-thumb {
