@@ -1,6 +1,6 @@
 <template>
   <div
-      class="fixed right-0 top-0 h-full bg-gray-800 transition-all duration-300 overflow-hidden z-20 text-white"
+      class="fixed left-12 top-0 h-full bg-gray-800 transition-all duration-300 overflow-hidden z-20 text-white"
       :class="{ 'w-96': isOpen, 'w-0': !isOpen }"
   >
     <div class="flex flex-col h-full" v-if="isOpen">
@@ -19,15 +19,35 @@
         <div class="flex items-center justify-between text-sm text-gray-400">
           <span>诊疗咨询</span>
           <div class="flex items-center space-x-2">
-            <button class="hover:text-white">
-              <Clock class="h-4 w-4" />
-            </button>
-            <button @click="newChat" class="hover:text-white">
-              <Plus class="h-4 w-4" />
-            </button>
-            <button class="hover:text-white">
-              <MoreHorizontal class="h-4 w-4" />
-            </button>
+            <!-- 会话历史 -->
+            <div class="relative group">
+              <button class="hover:text-white">
+                <Clock class="h-4 w-4" />
+              </button>
+              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                会话历史
+              </div>
+            </div>
+
+            <!-- 新建会话 -->
+            <div class="relative group">
+              <button @click="newChat" class="hover:text-white">
+                <Plus class="h-4 w-4" />
+              </button>
+              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                新建会话
+              </div>
+            </div>
+
+            <!-- 更多选项 -->
+            <div class="relative group">
+              <button class="hover:text-white">
+                <MoreHorizontal class="h-4 w-4" />
+              </button>
+              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                更多选项
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -78,15 +98,46 @@
 
             <!-- 操作按钮 -->
             <div class="ml-8 flex items-center space-x-2 mt-2">
-              <button class="text-gray-400 hover:text-white">
-                <Copy class="h-4 w-4" />
-              </button>
-              <button class="text-gray-400 hover:text-white">
-                <ThumbsUp class="h-4 w-4" />
-              </button>
-              <button class="text-gray-400 hover:text-white">
-                <ThumbsDown class="h-4 w-4" />
-              </button>
+              <!-- 复制按钮 -->
+              <div class="relative group">
+                <button
+                    @click="copyMessage(message.content)"
+                    class="text-gray-400 hover:text-white"
+                >
+                  <Copy class="h-4 w-4" />
+                </button>
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  复制
+                </div>
+              </div>
+
+              <!-- 点赞按钮 -->
+              <div class="relative group">
+                <button
+                    @click="likeMessage(index)"
+                    class="text-gray-400 hover:text-white"
+                    :class="{ 'text-green-400': message.liked }"
+                >
+                  <ThumbsUp class="h-4 w-4" />
+                </button>
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  点赞
+                </div>
+              </div>
+
+              <!-- 点踩按钮 -->
+              <div class="relative group">
+                <button
+                    @click="dislikeMessage(index)"
+                    class="text-gray-400 hover:text-white"
+                    :class="{ 'text-red-400': message.disliked }"
+                >
+                  <ThumbsDown class="h-4 w-4" />
+                </button>
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  点踩
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -134,9 +185,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import {
-  X, Minus, Clock, Plus, MoreHorizontal, Bot, User, ChevronRight,
+  X, Clock, Plus, MoreHorizontal, Bot, User, ChevronRight,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
 } from 'lucide-vue-next';
 
@@ -152,6 +203,8 @@ interface Message {
   content: string;
   isUser: boolean;
   references?: number;
+  liked?: boolean;
+  disliked?: boolean;
 }
 
 const messages = ref<Message[]>([
@@ -165,6 +218,9 @@ const messages = ref<Message[]>([
 const inputMessage = ref('');
 const isLoading = ref(false);
 
+// 注入Toast功能
+const showToast = inject<(message: string, type?: 'success' | 'like' | 'dislike') => void>('showToast');
+
 const newChat = () => {
   messages.value = [
     {
@@ -173,6 +229,40 @@ const newChat = () => {
       references: 4
     }
   ];
+};
+
+const copyMessage = async (content: string) => {
+  try {
+    await navigator.clipboard.writeText(content);
+    showToast?.('内容已复制到剪贴板', 'success');
+  } catch (err) {
+    console.error('复制失败:', err);
+    showToast?.('复制失败，请重试', 'success');
+  }
+};
+
+const likeMessage = (index: number) => {
+  const message = messages.value[index];
+  if (!message.isUser) {
+    message.liked = !message.liked;
+    if (message.liked) {
+      message.disliked = false;
+      showToast?.('感谢您的反馈！', 'like');
+    }
+    console.log('用户点赞了消息:', message.content);
+  }
+};
+
+const dislikeMessage = (index: number) => {
+  const message = messages.value[index];
+  if (!message.isUser) {
+    message.disliked = !message.disliked;
+    if (message.disliked) {
+      message.liked = false;
+      showToast?.('我们会改进回答质量', 'dislike');
+    }
+    console.log('用户点踩了消息:', message.content);
+  }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
