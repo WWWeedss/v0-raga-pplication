@@ -233,11 +233,34 @@ const newChat = () => {
 
 const copyMessage = async (content: string) => {
   try {
-    await navigator.clipboard.writeText(content);
-    showToast?.('内容已复制到剪贴板', 'success');
+    // 检查是否支持 navigator.clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(content);
+      showToast?.('内容已复制到剪贴板', 'success');
+      return;
+    }
+
+    // 降级方案：使用传统的 document.execCommand
+    const textArea = document.createElement('textarea');
+    textArea.value = content;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    if (successful) {
+      showToast?.('内容已复制到剪贴板', 'success');
+    } else {
+      throw new Error('execCommand copy failed');
+    }
+
   } catch (err) {
     console.error('复制失败:', err);
-    showToast?.('复制失败，请重试', 'success');
   }
 };
 
