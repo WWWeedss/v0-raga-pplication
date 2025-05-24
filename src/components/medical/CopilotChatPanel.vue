@@ -72,7 +72,7 @@
       <div class="flex-1 overflow-y-auto p-4 space-y-4">
         <div v-for="(message, index) in messages" :key="index" class="space-y-2">
           <!-- 用户消息 -->
-          <div v-if="message.isUser" class="flex items-start space-x-2">
+          <div v-if="message.role === 'user' " class="flex items-start space-x-2">
             <div class="w-6 h-6 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0">
               <User class="h-4 w-4 text-green-800" />
             </div>
@@ -89,9 +89,9 @@
             </div>
 
             <!-- 引用信息 -->
-            <div v-if="message.references" class="ml-8 text-xs text-gray-400">
+            <div v-if="message.source_documents" class="ml-8 text-xs text-gray-400">
               <ChevronRight class="h-3 w-3 inline mr-1" />
-              使用了 {{ message.references }} 条参考资料
+              使用了 {{ message.source_documents.length }} 条参考资料
             </div>
 
             <div class="ml-8 text-sm text-gray-300">{{ message.content }}</div>
@@ -185,11 +185,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from 'vue';
+import {ref, inject, onMounted} from 'vue';
 import {
   X, Clock, Plus, MoreHorizontal, Bot, User, ChevronRight,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
 } from 'lucide-vue-next';
+import type {MessageItem, SessionRecordModel} from "../../models/SessionRecordModel.ts";
+import {useSessionStore} from "../../stores/sessionStore.ts";
+import type {UserModel} from "../../models/UserModel.ts";
+import type {LLMResponse} from "../../models/LLMResponseModels.ts";
+import {ragQueryWithHistory} from "../../api/LLMcomponents.ts";
 
 defineProps<{
   isOpen: boolean;
@@ -199,37 +204,88 @@ defineEmits<{
   (e: 'close'): void;
 }>();
 
-interface Message {
-  content: string;
-  isUser: boolean;
-  references?: number;
-  liked?: boolean;
-  disliked?: boolean;
-}
-
-const messages = ref<Message[]>([
-  {
-    content: "您好！我可以帮助您进行医疗诊断分析。",
-    isUser: false,
-    references: 4
-  }
-]);
 
 const inputMessage = ref('');
 const isLoading = ref(false);
-
+const messages = ref<MessageItem[]>([]);
 // 注入Toast功能
 const showToast = inject<(message: string, type?: 'success' | 'like' | 'dislike') => void>('showToast');
 
 const newChat = () => {
-  messages.value = [
-    {
-      content: "您好！我可以帮助您进行医疗诊断分析。",
-      isUser: false,
-      references: 4
-    }
-  ];
+  messages.value = [];
+  inputMessage.value = '';
 };
+
+const sessionStore = useSessionStore();
+const userData:UserModel = JSON.parse(localStorage.getItem('userData') || '{}')
+
+onMounted(async () => {
+  const currentSession = sessionStore.getCurrentSession();
+  if(currentSession) {
+    messages.value = currentSession.session_data
+  }
+  console.log(currentSession)
+})
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+};
+
+const sendMessage = async () => {
+  if (!inputMessage.value.trim() || isLoading.value) return;
+
+  const userMessage = inputMessage.value;
+  messages.value.push({
+    role: 'user',
+    content: userMessage,
+    source_documents: []
+  });
+
+  inputMessage.value = '';
+  isLoading.value = true;
+
+  try{
+    const data: LLMResponse = await ragQueryWithHistory(messages.value);
+    const botMessage: MessageItem = {
+      content: data.answer,
+      role: "assistant",
+      source_documents: data.source_documents
+    };
+
+    messages.value.push(botMessage);
+
+    if(messages.value.length == 2){
+      //第一次问答成功，新建对话
+      const sessionData:SessionRecordModel = {
+        user_id: userData.user_id,
+        session_data: messages.value,
+      }
+      await sessionStore.addSession(sessionData);
+    }
+    else{
+      // 非第一次问答，更新会话
+      const curSession = sessionStore.getCurrentSession();
+      if (curSession) {
+        curSession.session_data = messages.value;
+        await sessionStore.updateSession(curSession);
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching response:', error);
+    messages.value.push({
+      content: '抱歉，发生了错误，请稍后再试。',
+      role: "assistant",
+      source_documents: []
+    });
+  } finally {
+    isLoading.value = false;
+    //todo 下滚聊天栏
+  }
+};
+
 
 const copyMessage = async (content: string) => {
   try {
@@ -288,33 +344,7 @@ const dislikeMessage = (index: number) => {
   }
 };
 
-const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-};
 
-const sendMessage = async () => {
-  if (!inputMessage.value.trim() || isLoading.value) return;
 
-  const userMessage = inputMessage.value;
-  messages.value.push({
-    content: userMessage,
-    isUser: true
-  });
 
-  inputMessage.value = '';
-  isLoading.value = true;
-
-  // 模拟AI回复
-  setTimeout(() => {
-    messages.value.push({
-      content: "基于您的描述，我建议进行以下检查和治疗方案...",
-      isUser: false,
-      references: 6
-    });
-    isLoading.value = false;
-  }, 2000);
-};
 </script>

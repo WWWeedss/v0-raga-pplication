@@ -160,7 +160,6 @@ const sendMessage = async (): Promise<void> => {
 
   try {
     const data: LLMResponse = await ragQueryWithHistory(messages.value);
-
     const botMessage: MessageItem = {
       content: data.answer,
       role: "assistant",

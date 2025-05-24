@@ -19,10 +19,11 @@ export const useSessionStore = defineStore('session', {
     }),
     actions: {
         async fetchSessions(){
-            this.sessions = await getSessionRecordByUserId(userData.user_id)
+            this.sessions = await getSessionRecordByUserId(userData.user_id);
         },
         // 获取当前的对话记录
         getCurrentSession(): SessionRecordModel | null {
+            console.log(this.currentSessionIndex)
             if (this.currentSessionIndex === -1 || this.currentSessionIndex >= this.sessions.length) {
                 return null;
             }
@@ -37,7 +38,6 @@ export const useSessionStore = defineStore('session', {
             const new_session = await createSessionRecord(session)
             // 添加 index = 0 的位置
             this.sessions.unshift(new_session);
-            console.log(this.sessions)
             this.currentSessionIndex = 0; // 设置为新添加的会话索引
         },
         // 修改当前会话记录
