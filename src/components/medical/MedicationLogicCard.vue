@@ -8,7 +8,7 @@
           class="flex items-center space-x-2 px-4 py-2 bg-green-400 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': isGenerating }" />
-        <span>{{ isGenerating ? '生成中...' : '输入进一步求索（可选）' }}</span>
+        <span>{{ isGenerating ? '生成中...' : '一键生成' }}</span>
       </button>
     </div>
 
