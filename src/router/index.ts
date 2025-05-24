@@ -3,12 +3,13 @@ import LoginPage from '../pages/LoginPage.vue'
 import ChatPage from '../pages/ChatPage.vue'
 import { getCurrentUser } from '../api/UserComponents'
 import { inject } from 'vue'
+import MedicalRecordPage from "../pages/MedicalRecordPage.vue";
 
 // 创建路由
 const routes = [
     {
         path: '/',
-        redirect: '/login'
+        redirect: '/medical'  // 改为重定向到 medical 页面
     },
     {
         path: '/login',
@@ -16,10 +17,19 @@ const routes = [
         component: LoginPage
     },
     {
+        path: '/medical',
+        name: 'Medical',
+        component: MedicalRecordPage,
+        meta: { requiresAuth: true }
+    },
+    {
         path: '/chat',
         name: 'Chat',
         component: ChatPage,
-        meta: { requiresAuth: true }
+        meta: {
+            requiresAuth: true,
+            hidden: true  // 标记为隐藏路由，不在导航中显示
+        }
     }
 ]
 
@@ -52,7 +62,7 @@ router.beforeEach(async (to, _from, next) => {
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (isLoggedIn()) {
-            // 如果本地数据存在，且用户上一次登录在 24 小时内，直接进入 chat 页面
+            // 如果本地数据存在，且用户上一次登录在 24 小时内，允许访问
             next()
         } else {
             try {
@@ -72,7 +82,7 @@ router.beforeEach(async (to, _from, next) => {
         }
     } else if (to.path === '/login') {
         if (isLoggedIn()) {
-            next('/chat') // 如果已经登录，直接跳转到 chat 页面
+            next('/medical') // 如果已经登录，直接跳转到 medical 页面
         } else {
             next() // 允许访问登录页
         }
