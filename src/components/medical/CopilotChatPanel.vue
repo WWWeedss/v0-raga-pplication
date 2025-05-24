@@ -21,12 +21,7 @@
           <div class="flex items-center space-x-2">
             <!-- 会话历史 -->
             <div class="relative group">
-              <button class="hover:text-white">
-                <Clock class="h-4 w-4" />
-              </button>
-              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                会话历史
-              </div>
+              <ConversationHistoryDropdown @conversationSelected="loadConversation" />
             </div>
 
             <!-- 新建会话 -->
@@ -69,7 +64,7 @@
       </div>
 
       <!-- 聊天消息区域 -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
         <div v-for="(message, index) in messages" :key="index" class="space-y-2">
           <!-- 用户消息 -->
           <div v-if="message.role === 'user' " class="flex items-start space-x-2">
@@ -89,9 +84,8 @@
             </div>
 
             <!-- 引用信息 -->
-            <div v-if="message.source_documents" class="ml-8 text-xs text-gray-400">
-              <ChevronRight class="h-3 w-3 inline mr-1" />
-              使用了 {{ message.source_documents.length }} 条参考资料
+            <div v-if="message.source_documents && message.source_documents.length > 0" class="ml-8">
+              <ReferencesDisplay :references="message.source_documents" />
             </div>
 
             <div class="ml-8 text-sm text-gray-300">{{ message.content }}</div>
@@ -185,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, inject, onMounted} from 'vue';
+import {ref, inject, onMounted, nextTick} from 'vue';
 import {
   X, Clock, Plus, MoreHorizontal, Bot, User, ChevronRight,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
@@ -195,6 +189,8 @@ import {useSessionStore} from "../../stores/sessionStore.ts";
 import type {UserModel} from "../../models/UserModel.ts";
 import type {LLMResponse} from "../../models/LLMResponseModels.ts";
 import {ragQueryWithHistory} from "../../api/LLMcomponents.ts";
+import ConversationHistoryDropdown from "./ConversationHistoryDropdown.vue";
+import ReferencesDisplay from "./ReferencesDisplay.vue";
 
 defineProps<{
   isOpen: boolean;
@@ -211,9 +207,19 @@ const messages = ref<MessageItem[]>([]);
 // 注入Toast功能
 const showToast = inject<(message: string, type?: 'success' | 'like' | 'dislike') => void>('showToast');
 
+const messagesContainer = ref<HTMLElement | null>(null);
+const scrollToBottom = async () => {
+  await nextTick();
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+  }
+};
+
+//开启新对话
 const newChat = () => {
   messages.value = [];
   inputMessage.value = '';
+   sessionStore.setCurrentSessionIndex(-1);
 };
 
 const sessionStore = useSessionStore();
@@ -224,7 +230,6 @@ onMounted(async () => {
   if(currentSession) {
     messages.value = currentSession.session_data
   }
-  console.log(currentSession)
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -245,6 +250,7 @@ const sendMessage = async () => {
   });
 
   inputMessage.value = '';
+  await scrollToBottom();
   isLoading.value = true;
 
   try{
@@ -282,8 +288,17 @@ const sendMessage = async () => {
     });
   } finally {
     isLoading.value = false;
-    //todo 下滚聊天栏
+    await scrollToBottom();
   }
+};
+
+const loadConversation = async (session: SessionRecordModel, index: number) => {
+  sessionStore.setCurrentSessionIndex(index);
+  const currentSession = sessionStore.getCurrentSession();
+  if(currentSession) {
+    messages.value = currentSession.session_data;
+  }
+  await scrollToBottom();
 };
 
 
