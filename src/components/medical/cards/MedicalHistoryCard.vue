@@ -13,8 +13,8 @@
 
     <div class="min-h-[120px]">
       <div v-if="!isEditing" class="p-4 border border-gray-200 rounded-md bg-gray-50">
-        <div v-if="history" class="text-gray-700 whitespace-pre-wrap">
-          {{ history }}
+        <div v-if="reportStore.medicalHistory" class="text-gray-700 whitespace-pre-wrap">
+          {{ reportStore.medicalHistory }}
         </div>
         <div v-else class="text-gray-500">
           病史信息将根据上传的病历自动生成，或可手动编辑
@@ -36,18 +36,19 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Edit } from 'lucide-vue-next';
+import {useReportStore} from "../../../stores/reportStore.ts";
 
-const history = ref('患者既往有高血压病史3年，规律服用降压药物。无糖尿病、心脏病等其他慢性疾病史。无药物过敏史。');
-const editableHistory = ref(history.value);
+const reportStore = useReportStore();
+const editableHistory = ref(reportStore.medicalHistory);
 const isEditing = ref(false);
 
 const toggleEdit = () => {
   if (isEditing.value) {
     // 保存编辑
-    history.value = editableHistory.value;
+    reportStore.medicalHistory = editableHistory.value;
   } else {
     // 开始编辑
-    editableHistory.value = history.value;
+    editableHistory.value = reportStore.medicalHistory;
   }
   isEditing.value = !isEditing.value;
 };

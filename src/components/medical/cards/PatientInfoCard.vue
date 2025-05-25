@@ -6,7 +6,7 @@
         <label class="block text-sm font-medium text-gray-700">患者姓名</label>
         <input
             type="text"
-            v-model="patientInfo.name"
+            v-model="reportStore.patientName"
             placeholder="自动生成"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
@@ -15,7 +15,7 @@
         <label class="block text-sm font-medium text-gray-700">患者年龄</label>
         <input
             type="text"
-            v-model="patientInfo.age"
+            v-model="reportStore.patientAge"
             placeholder="自动生成"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
@@ -24,7 +24,7 @@
         <label class="block text-sm font-medium text-gray-700">患者性别</label>
         <input
             type="text"
-            v-model="patientInfo.gender"
+            v-model="reportStore.patientGender"
             placeholder="自动生成"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
@@ -34,11 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import {useReportStore} from "../../../stores/reportStore.ts";
 
-const patientInfo = ref({
-  name: '',
-  age: '',
-  gender: ''
-});
+const reportStore = useReportStore();
 </script>

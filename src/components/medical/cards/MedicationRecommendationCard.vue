@@ -14,7 +14,7 @@
             class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': isGenerating }" />
-          <span>{{ isGenerating ? '生成中...' : '一键生成' }}</span>
+          <span>{{ isGenerating ? '生成中...' : '单步生成' }}</span>
         </button>
       </div>
     </div>
@@ -28,7 +28,7 @@
         </h3>
         <div class="min-h-[150px]">
           <textarea
-              v-model="doctorRecommendation"
+              v-model="reportStore.drugAdvice"
               placeholder="请审核并编辑AI建议，或输入您的开药建议..."
               class="w-full h-full min-h-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           ></textarea>
@@ -54,10 +54,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RefreshCw, Bot, User } from 'lucide-vue-next';
+import {useReportStore} from "../../../stores/reportStore.ts";
 
 const isGenerating = ref(false);
 const aiRecommendation = ref('');
-const doctorRecommendation = ref('');
+const reportStore = useReportStore();
 const additionalRequirement = ref('');
 
 const generateRecommendation = async () => {
