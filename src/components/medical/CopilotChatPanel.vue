@@ -181,7 +181,7 @@
 <script setup lang="ts">
 import {ref, inject, onMounted, nextTick} from 'vue';
 import {
-  X, Clock, Plus, MoreHorizontal, Bot, User, ChevronRight,
+  X, Plus, MoreHorizontal, Bot, User,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
 } from 'lucide-vue-next';
 import type {MessageItem, SessionRecordModel} from "../../models/SessionRecordModel.ts";
@@ -268,6 +268,7 @@ const sendMessage = async () => {
       const sessionData:SessionRecordModel = {
         user_id: userData.user_id,
         session_data: messages.value,
+        timestamp: ""
       }
       await sessionStore.addSession(sessionData);
     }
@@ -292,8 +293,7 @@ const sendMessage = async () => {
   }
 };
 
-const loadConversation = async (session: SessionRecordModel, index: number) => {
-  sessionStore.setCurrentSessionIndex(index);
+const loadConversation = async () => {
   const currentSession = sessionStore.getCurrentSession();
   if(currentSession) {
     messages.value = currentSession.session_data;
@@ -337,7 +337,7 @@ const copyMessage = async (content: string) => {
 
 const likeMessage = (index: number) => {
   const message = messages.value[index];
-  if (!message.isUser) {
+  if (message.role === 'assistant') {
     message.liked = !message.liked;
     if (message.liked) {
       message.disliked = false;
@@ -349,7 +349,7 @@ const likeMessage = (index: number) => {
 
 const dislikeMessage = (index: number) => {
   const message = messages.value[index];
-  if (!message.isUser) {
+  if (message.role === 'assistant') {
     message.disliked = !message.disliked;
     if (message.disliked) {
       message.liked = false;

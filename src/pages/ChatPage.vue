@@ -173,6 +173,7 @@ const sendMessage = async (): Promise<void> => {
       const sessionData:SessionRecordModel = {
         user_id: userData.user_id,
         session_data: messages.value,
+        timestamp:""
       }
 
       await sessionStore.addSession(sessionData);

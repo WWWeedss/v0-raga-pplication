@@ -52,21 +52,12 @@
                   {{ getConversationTitle(session) }}
                 </p>
                 <p class="text-xs text-gray-400 mt-1">
-                  {{ formatRelativeTime(session.session_id) }} • {{ session.session_data.length }} messages
+                  {{ formatRelativeTime(session.timestamp) }} • {{ session.session_data.length }} messages
                 </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-4 py-3 border-t border-gray-700 bg-gray-800">
-        <button
-            class="w-full text-left text-sm text-gray-300 hover:text-white transition-colors flex items-center"
-        >
-          <span>View all Conversations</span>
-        </button>
       </div>
     </div>
   </div>
@@ -79,7 +70,7 @@ import { useSessionStore } from '../../stores/sessionStore';
 import type { SessionRecordModel } from '../../models/SessionRecordModel';
 
 const emit = defineEmits<{
-  (e: 'conversationSelected', session: SessionRecordModel, index: number): void;
+  (e: 'conversationSelected'): void;
 }>();
 
 const sessionStore = useSessionStore();
@@ -97,7 +88,7 @@ const selectConversation = (index: number) => {
   const session = sessionStore.sessions[index];
   if (session) {
     sessionStore.setCurrentSessionIndex(index);
-    emit('conversationSelected', session, index);
+    emit('conversationSelected');
     closeDropdown();
   }
 };
@@ -110,13 +101,24 @@ const getConversationTitle = (session: SessionRecordModel): string => {
   return 'New Conversation';
 };
 
-const formatRelativeTime = (sessionId?: number): string => {
-  // Since we don't have actual timestamps, we'll use a simple format
-  // You can enhance this based on your actual data structure
+const formatRelativeTime = (timestamp : string): string => {
+  if(!timestamp || timestamp.length === 0) {
+    return "recently";
+  }
+
   const now = new Date();
-  const hours = Math.floor(Math.random() * 24) + 1;
-  const minutes = Math.floor(Math.random() * 60);
-  return `${hours} hours ${minutes} minutes ago`;
+  const messageTime = new Date(timestamp);
+  const diff = Math.abs(now.getTime() - messageTime.getTime());
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const daysText = days > 0 ? `${days} days` : '';
+  const hoursText = hours > 0 ? `${hours} hours` : '';
+  const minutesText = minutes > 0 ? `${minutes} minutes` : '';
+  if (daysText.length === 0 && hoursText.length === 0 && minutesText.length === 0) {
+    return "recently";
+  }
+  return `${daysText} ${hoursText} ${minutesText} ago`.trim();
 };
 
 // Click outside to close
