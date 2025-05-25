@@ -33,16 +33,6 @@
                 新建会话
               </div>
             </div>
-
-            <!-- 更多选项 -->
-            <div class="relative group">
-              <button class="hover:text-white">
-                <MoreHorizontal class="h-4 w-4" />
-              </button>
-              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                更多选项
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -100,7 +90,7 @@
                 >
                   <Copy class="h-4 w-4" />
                 </button>
-                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-50">
                   复制
                 </div>
               </div>
@@ -114,7 +104,7 @@
                 >
                   <ThumbsUp class="h-4 w-4" />
                 </button>
-                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-50">
                   点赞
                 </div>
               </div>
@@ -128,7 +118,7 @@
                 >
                   <ThumbsDown class="h-4 w-4" />
                 </button>
-                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-50">
                   点踩
                 </div>
               </div>
@@ -181,7 +171,7 @@
 <script setup lang="ts">
 import {ref, inject, onMounted, nextTick} from 'vue';
 import {
-  X, Plus, MoreHorizontal, Bot, User,
+  X, Plus, Bot, User,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
 } from 'lucide-vue-next';
 import type {MessageItem, SessionRecordModel} from "../../models/SessionRecordModel.ts";
@@ -219,7 +209,7 @@ const scrollToBottom = async () => {
 const newChat = () => {
   messages.value = [];
   inputMessage.value = '';
-   sessionStore.setCurrentSessionIndex(-1);
+  sessionStore.setCurrentSessionIndex(-1);
 };
 
 const sessionStore = useSessionStore();
@@ -297,6 +287,9 @@ const loadConversation = async () => {
   const currentSession = sessionStore.getCurrentSession();
   if(currentSession) {
     messages.value = currentSession.session_data;
+  } else {
+    // 如果没有当前会话（比如被删除了），清空消息
+    messages.value = [];
   }
   await scrollToBottom();
 };
@@ -358,8 +351,5 @@ const dislikeMessage = (index: number) => {
     console.log('用户点踩了消息:', message.content);
   }
 };
-
-
-
 
 </script>
