@@ -174,11 +174,11 @@ import {
   X, Plus, Bot, User,
   Copy, ThumbsUp, ThumbsDown, Sparkles, Send
 } from 'lucide-vue-next';
-import type {MessageItem, SessionRecordModel} from "../../models/SessionRecordModel.ts";
-import {useSessionStore} from "../../stores/sessionStore.ts";
-import type {UserModel} from "../../models/UserModel.ts";
-import type {LLMResponse} from "../../models/LLMResponseModels.ts";
-import {ragQueryWithHistory} from "../../api/LLMcomponents.ts";
+import type {MessageItem, SessionRecordModel} from "../../../models/SessionRecordModel.ts";
+import {useSessionStore} from "../../../stores/sessionStore.ts";
+import type {UserModel} from "../../../models/UserModel.ts";
+import type {LLMResponse} from "../../../models/LLMResponseModels.ts";
+import {ragQueryWithHistory} from "../../../api/LLMcomponents.ts";
 import ConversationHistoryDropdown from "./ConversationHistoryDropdown.vue";
 import ReferencesDisplay from "./ReferencesDisplay.vue";
 

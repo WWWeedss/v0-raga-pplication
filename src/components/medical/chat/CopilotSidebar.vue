@@ -46,11 +46,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Upload, Download, MessageSquare, Database, Settings } from 'lucide-vue-next';
-import SidebarIcon from './SidebarIcon.vue';
-import UploadModal from './UploadModal.vue';
-import ExportModal from './ExportModal.vue';
-import KnowledgeModal from './KnowledgeModal.vue';
-import SettingsModal from '../chatpage-components/SettingsModal.vue';
+import SidebarIcon from '../SidebarIcon.vue';
+import UploadModal from '../UploadModal.vue';
+import ExportModal from '../ExportModal.vue';
+import KnowledgeModal from '../KnowledgeModal.vue';
+import SettingsModal from '../../chatpage-components/SettingsModal.vue';
 
 defineEmits(['changeChatVisible']);
 

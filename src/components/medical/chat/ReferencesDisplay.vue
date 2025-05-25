@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { ref, computed, inject } from 'vue';
 import { ChevronRight, FileText, Copy } from 'lucide-vue-next';
-import type { source_document } from '../../models/LLMResponseModels';
+import type { source_document } from '../../../models/LLMResponseModels.ts';
 
 const props = defineProps<{
   references: source_document[];

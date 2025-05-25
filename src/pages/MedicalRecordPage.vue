@@ -65,14 +65,14 @@
 
 <script setup lang="ts">
 import { ref, provide } from 'vue';
-import CopilotSidebar from '../components/medical/CopilotSidebar.vue';
-import PatientInfoCard from '../components/medical/PatientInfoCard.vue';
-import MedicalHistoryCard from '../components/medical/MedicalHistoryCard.vue';
-import SymptomsCard from '../components/medical/SymptomsCard.vue';
-import MedicationRecommendationCard from '../components/medical/MedicationRecommendationCard.vue';
-import MedicationLogicCard from '../components/medical/MedicationLogicCard.vue';
-import HealthAdviceCard from '../components/medical/HealthAdviceCard.vue';
-import CopilotChatPanel from '../components/medical/CopilotChatPanel.vue';
+import CopilotSidebar from '../components/medical/chat/CopilotSidebar.vue';
+import PatientInfoCard from '../components/medical/cards/PatientInfoCard.vue';
+import MedicalHistoryCard from '../components/medical/cards/MedicalHistoryCard.vue';
+import SymptomsCard from '../components/medical/cards/SymptomsCard.vue';
+import MedicationRecommendationCard from '../components/medical/cards/MedicationRecommendationCard.vue';
+import MedicationLogicCard from '../components/medical/cards/MedicationLogicCard.vue';
+import HealthAdviceCard from '../components/medical/cards/HealthAdviceCard.vue';
+import CopilotChatPanel from '../components/medical/chat/CopilotChatPanel.vue';
 import UserAvatar from "../components/chatpage-components/UserAvatar.vue";
 import Toast from '../components/common/Toast.vue';
 

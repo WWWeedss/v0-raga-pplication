@@ -80,8 +80,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Clock, X, MessageSquare, Trash2 } from 'lucide-vue-next';
-import { useSessionStore } from '../../stores/sessionStore';
-import type { SessionRecordModel } from '../../models/SessionRecordModel';
+import { useSessionStore } from '../../../stores/sessionStore.ts';
+import type { SessionRecordModel } from '../../../models/SessionRecordModel.ts';
 
 const emit = defineEmits<{
   (e: 'conversationSelected'): void;
