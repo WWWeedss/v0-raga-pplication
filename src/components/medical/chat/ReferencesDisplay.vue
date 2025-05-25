@@ -42,15 +42,17 @@
 
           <!-- Reference Content -->
           <div class="space-y-2">
-            <!-- Original Query -->
-            <div class="bg-gray-800 rounded p-2">
+            <!-- Original Query - 只在有 query 时显示 -->
+            <div v-if="reference.metadata.query && reference.metadata.query.trim()" class="bg-gray-800 rounded p-2">
               <div class="text-gray-400 mb-1">原始问题:</div>
               <div class="text-gray-200">{{ reference.metadata.query }}</div>
             </div>
 
             <!-- Response -->
             <div class="bg-gray-800 rounded p-2">
-              <div class="text-gray-400 mb-1">参考回答:</div>
+              <div class="text-gray-400 mb-1">
+                {{ reference.metadata.query && reference.metadata.query.trim() ? '参考回答:' : '参考内容:' }}
+              </div>
               <div
                   class="text-gray-200"
                   :class="{ 'line-clamp-3': !expandedRefs.has(index) }"
@@ -106,7 +108,13 @@ const toggleExpanded = (index: number) => {
 
 const copyReference = async (reference: source_document) => {
   try {
-    const content = `问题: ${reference.metadata.query}\n\n回答: ${reference.metadata.response}`;
+    // 根据是否有 query 来构建复制内容
+    let content = '';
+    if (reference.metadata.query && reference.metadata.query.trim()) {
+      content = `问题: ${reference.metadata.query}\n\n回答: ${reference.metadata.response}`;
+    } else {
+      content = `参考内容: ${reference.metadata.response}`;
+    }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(content);
@@ -134,23 +142,3 @@ const copyReference = async (reference: source_document) => {
   }
 };
 </script>
-
-<style scoped>
-.references-enter-active,
-.references-leave-active {
-  transition: all 0.3s ease;
-}
-
-.references-enter-from,
-.references-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>
