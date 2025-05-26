@@ -77,8 +77,8 @@ const emit = defineEmits<{
 
 const visible = ref(false);
 const progress = ref(0);
-let hideTimer: NodeJS.Timeout | null = null;
-let progressTimer: NodeJS.Timeout | null = null;
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
+let progressTimer: ReturnType<typeof setTimeout> | null = null;
 
 const formattedMessage = computed(() => {
   return props.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');

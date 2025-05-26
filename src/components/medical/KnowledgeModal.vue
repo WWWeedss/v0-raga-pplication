@@ -247,7 +247,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import {
   X, Upload, Check, RefreshCw, Database,
   FileText, Pill, Heart, HelpCircle,
-  File, FileSpreadsheet, Code, Archive
+  File, FileSpreadsheet, Code
 } from 'lucide-vue-next';
 import {
   getKnowledgeFiles,
@@ -637,3 +637,4 @@ onMounted(() => {
   background: #94a3b8;
 }
 </style>
+
