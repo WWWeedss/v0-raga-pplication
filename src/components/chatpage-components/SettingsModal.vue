@@ -51,7 +51,7 @@
         <div class="flex justify-end p-4 border-t border-gray-700 bg-gray-900">
           <button
               @click="saveSettings"
-              class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
+              class="px-4 py-2 bg-green-400 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
           >
             保存设置
           </button>
@@ -114,7 +114,7 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 18px;
   height: 18px;
-  background: #a855f7; /* purple-600 */
+  background: lightgreen; /* green-400 */
   border-radius: 50%;
   cursor: pointer;
 }
@@ -122,7 +122,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: #a855f7; /* purple-600 */
+  background: #a8f7; /* purple-600 */
   border-radius: 50%;
   cursor: pointer;
 }

@@ -6,6 +6,7 @@ import router from './router/index.ts'
 import axios from "axios";
 import type { UserModel } from "./models/UserModel.ts";
 import {createPinia} from "pinia";
+import piniaPersist from 'pinia-plugin-persistedstate'
 
 // 配置 axios
 axios.defaults.withCredentials = true // 确保跨域请求发送 cookies
@@ -30,6 +31,7 @@ app.provide('userData', userData)
 app.provide('globalState', globalState)
 
 const pinia = createPinia()
+pinia.use(piniaPersist)
 app.use(pinia)
 
 app.mount('#app')

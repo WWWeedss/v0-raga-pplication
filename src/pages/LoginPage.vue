@@ -117,7 +117,7 @@ const handleSubmit = async () => {
 
       // 不需要手动存储 token，因为它已经作为 cookie 存储
       // 直接跳转到聊天页面
-      router.push('/chat')
+      router.push('/medical')
     } else {
       // 注册逻辑
       const response = await register(user)

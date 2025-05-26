@@ -12,8 +12,9 @@ export interface LLMResponse {
     source_documents: source_document[];
 }
 
-export interface Message {
-    content: string;
-    isUser: boolean;
-    source_documents?: source_document[];
+export interface PatientInfo {
+    patient_name: string;
+    patient_age: string;
+    patient_gender: string;
+    patient_medical_history: string;
 }

@@ -38,4 +38,15 @@ export async function updateSingleSessionRecord(sessionData: SessionRecordModel)
     });
 }
 
+export async function deleteSingleSessionRecord(sessionId: number) {
+    return axios.put(`${BASE_URL}/deleteSession/${sessionId}`, ).then(
+        (response) => {
+            return response.data;
+        }
+    ).catch((error) => {
+        console.error("Error in deleteSingleSessionRecord:", error);
+        throw error;
+    });
+}
+
 
