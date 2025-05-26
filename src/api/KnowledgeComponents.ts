@@ -1,72 +1,93 @@
-import axios from 'axios';
-import type { KnowledgeFileResponse } from '../models/KnowledgeFileModel';
-import { CURRENT_ENVIRONMENT } from "./EnvironmentPrefix";
-import { KNOWLEDGE_MODULE } from "./ComponentPrefix";
+import axios from "axios"
+import type { KnowledgeFileResponse } from "../models/KnowledgeFileModel"
+import { CURRENT_ENVIRONMENT } from "./EnvironmentPrefix"
+import { KNOWLEDGE_MODULE } from "./ComponentPrefix"
 
-const BASE_URL = CURRENT_ENVIRONMENT + KNOWLEDGE_MODULE;
+const BASE_URL = CURRENT_ENVIRONMENT + KNOWLEDGE_MODULE
 
 /**
  * 上传问答知识库文件
  */
-export async function uploadQaFile(file: File, indexName?: string): Promise<KnowledgeFileResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  if (indexName) {
-    formData.append('index_name', indexName);
-  }
-  
-  return axios.post(`${BASE_URL}/qa`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  }).then((response: any) => {
-    return response.data as KnowledgeFileResponse;
-  }).catch((error: any) => {
-    console.error("Error in uploadQaFile:", error);
-    throw error;
-  });
+export async function uploadQaFile(file: File): Promise<KnowledgeFileResponse> {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  return axios
+      .post(`${BASE_URL}/qa`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response: any) => {
+        return response.data as KnowledgeFileResponse
+      })
+      .catch((error: any) => {
+        console.error("Error in uploadQaFile:", error)
+        throw error
+      })
 }
 
 /**
- * 上传医生知识库文件
+ * 上传药品知识库文件
  */
-export async function uploadDoctorFile(file: File, indexName?: string): Promise<KnowledgeFileResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  if (indexName) {
-    formData.append('index_name', indexName);
-  }
-  
-  return axios.post(`${BASE_URL}/doctor`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  }).then((response: any) => {
-    return response.data as KnowledgeFileResponse;
-  }).catch((error: any) => {
-    console.error("Error in uploadDoctorFile:", error);
-    throw error;
-  });
+export async function uploadPharmaceuticalFile(file: File): Promise<KnowledgeFileResponse> {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  return axios
+      .post(`${BASE_URL}/pharmaceutical`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response: any) => {
+        return response.data as KnowledgeFileResponse
+      })
+      .catch((error: any) => {
+        console.error("Error in uploadPharmaceuticalFile:", error)
+        throw error
+      })
+}
+
+/**
+ * 上传保健知识库文件
+ */
+export async function uploadHealthFile(file: File): Promise<KnowledgeFileResponse> {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  return axios
+      .post(`${BASE_URL}/health`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response: any) => {
+        return response.data as KnowledgeFileResponse
+      })
+      .catch((error: any) => {
+        console.error("Error in uploadHealthFile:", error)
+        throw error
+      })
 }
 
 /**
  * 获取知识库文件列表
  */
-export async function getKnowledgeFiles(fileType?: string, skip: number = 0, limit: number = 100): Promise<KnowledgeFileResponse[]> {
-  let url = `${BASE_URL}?skip=${skip}&limit=${limit}`;
-  
+export async function getKnowledgeFiles(fileType?: string, skip = 0, limit = 100): Promise<KnowledgeFileResponse[]> {
+  let url = `${BASE_URL}?skip=${skip}&limit=${limit}`
+
   if (fileType) {
-    url += `&file_type=${fileType}`;
+    url += `&file_type=${fileType}`
   }
-  
-  return axios.get(url)
-    .then((response: any) => {
-      return response.data as KnowledgeFileResponse[];
-    })
-    .catch((error: any) => {
-      console.error("Error in getKnowledgeFiles:", error);
-      throw error;
-    });
-} 
+
+  return axios
+      .get(url)
+      .then((response: any) => {
+        return response.data as KnowledgeFileResponse[]
+      })
+      .catch((error: any) => {
+        console.error("Error in getKnowledgeFiles:", error)
+        throw error
+      })
+}
