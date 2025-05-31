@@ -254,7 +254,7 @@ const startAnalysis = async () => {
 
     // 调用 API 分析患者信息
     const patientInfo: PatientInfo = await analysePatientInfo(fileContent);
-
+    console.log('分析结果:', patientInfo);
     // 更新 store 中的患者信息
     reportStore.patientName = patientInfo.patient_name;
     reportStore.patientAge = patientInfo.patient_age;
