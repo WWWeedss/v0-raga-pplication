@@ -99,7 +99,7 @@ import MedicationRecommendationCard from '../components/medical/cards/Medication
 import MedicationLogicCard from '../components/medical/cards/MedicationLogicCard.vue';
 import HealthAdviceCard from '../components/medical/cards/HealthAdviceCard.vue';
 import CopilotChatPanel from '../components/medical/chat/CopilotChatPanel.vue';
-import UserAvatar from "../components/chatpage-components/UserAvatar.vue";
+import UserAvatar from "../components/medical/UserAvatar.vue";
 import Toast from '../components/common/Toast.vue';
 import AIGenerationCard from '../components/medical/cards/AIGenerationCard.vue';
 

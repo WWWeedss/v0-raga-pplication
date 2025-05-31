@@ -50,7 +50,7 @@ import SidebarIcon from '../SidebarIcon.vue';
 import UploadModal from '../UploadModal.vue';
 import ExportModal from '../ExportModal.vue';
 import KnowledgeModal from '../KnowledgeModal.vue';
-import SettingsModal from '../../chatpage-components/SettingsModal.vue';
+import SettingsModal from '../SettingsModal.vue';
 
 defineEmits(['changeChatVisible']);
 
