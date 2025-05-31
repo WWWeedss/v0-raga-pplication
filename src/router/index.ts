@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '../pages/LoginPage.vue'
-import ChatPage from '../pages/ChatPage.vue'
 import { getCurrentUser } from '../api/UserComponents'
 import { inject } from 'vue'
 import MedicalRecordPage from "../pages/MedicalRecordPage.vue";
@@ -21,15 +20,6 @@ const routes = [
         name: 'Medical',
         component: MedicalRecordPage,
         meta: { requiresAuth: true }
-    },
-    {
-        path: '/chat',
-        name: 'Chat',
-        component: ChatPage,
-        meta: {
-            requiresAuth: true,
-            hidden: true  // 标记为隐藏路由，不在导航中显示
-        }
     }
 ]
 
