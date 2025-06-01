@@ -17,6 +17,11 @@ export const useReportStore = defineStore("report",{
         healthAdvice : "",
     }),
     actions: {
+        getPatientInfoPrompt(): string {
+            return `患者年龄：${this.patientAge}，患者性别：${this.patientGender}，过往病史：${this.medicalHistory}`;
+        }
     },
     persist: true,
 })
+
+export type ReportStore = ReturnType<typeof useReportStore>;

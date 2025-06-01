@@ -11,5 +11,4 @@ export interface KnowledgeFileResponse {
 
 export interface KnowledgeFileUploadParams {
   file: File;
-
 } 

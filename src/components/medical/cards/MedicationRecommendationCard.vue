@@ -55,6 +55,7 @@
 import { ref } from 'vue';
 import { RefreshCw, Bot, User } from 'lucide-vue-next';
 import {useReportStore} from "../../../stores/reportStore.ts";
+import {generateMedicalRecommendationResponse} from "../../../api/ReportComponents.ts";
 
 const isGenerating = ref(false);
 const aiRecommendation = ref('');
@@ -64,31 +65,11 @@ const additionalRequirement = ref('');
 const generateRecommendation = async () => {
   isGenerating.value = true;
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    let baseRecommendation = `基于患者症状，建议使用以下药物：
-
-1. 阿莫西林胶囊 0.5g
-   - 用法：每日3次，饭后服用
-   - 疗程：7-10天
-
-2. 布洛芬缓释胶囊 0.3g
-   - 用法：每日2次，饭后服用
-   - 注意：避免空腹服用
-
-3. 维生素C片 0.1g
-   - 用法：每日1次
-   - 作用：增强免疫力`;
-
-    // 如果有额外要求，添加到建议中
-    if (additionalRequirement.value.trim()) {
-      baseRecommendation += `\n\n根据您的额外要求"${additionalRequirement.value}"，补充建议：\n- 请密切观察患者反应\n- 如有不适请及时调整用药`;
-    }
-
-    aiRecommendation.value = baseRecommendation;
+    aiRecommendation.value = await generateMedicalRecommendationResponse(reportStore, additionalRequirement.value);
   } finally {
     isGenerating.value = false;
   }
 };
+
+
 </script>

@@ -55,6 +55,7 @@
 import { ref } from 'vue';
 import { RefreshCw, Bot, User } from 'lucide-vue-next';
 import {useReportStore} from "../../../stores/reportStore.ts";
+import {generateMedicalLogicResponse} from "../../../api/ReportComponents.ts";
 
 const isGenerating = ref(false);
 const aiLogic = ref('');
@@ -62,36 +63,16 @@ const reportStore = useReportStore();
 const additionalRequirement = ref('');
 
 const generateLogic = async () => {
+  if (reportStore.drugAdvice.trim() === '') {
+    aiLogic.value = "开药单据为空，无法生成开药逻辑。请先输入开药建议。";
+    return;
+  }
   isGenerating.value = true;
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    let baseLogic = `开药逻辑分析：
-
-1. 症状分析
-   - 患者主诉发热、咳嗽
-   - 体温38.5°C，持续2天
-   - 咳嗽有痰，无血丝
-
-2. 诊断依据
-   - 临床症状符合上呼吸道感染
-   - 血常规显示白细胞轻度升高
-   - 胸片未见明显异常
-
-3. 用药原理
-   - 阿莫西林：广谱抗生素，针对细菌感染
-   - 布洛芬：解热镇痛，缓解发热症状
-   - 维生素C：辅助治疗，增强免疫力`;
-
-    // 如果有额外要求，添加到逻辑中
-    if (additionalRequirement.value.trim()) {
-      baseLogic += `\n\n根据您的额外要求"${additionalRequirement.value}"，补充分析：\n- 需要考虑患者个体差异\n- 建议定期复查评估疗效`;
-    }
-
-    aiLogic.value = baseLogic;
+    aiLogic.value = await generateMedicalLogicResponse(reportStore, additionalRequirement.value);
   } finally {
     isGenerating.value = false;
   }
 };
+
 </script>
