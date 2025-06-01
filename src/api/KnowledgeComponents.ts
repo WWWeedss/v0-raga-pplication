@@ -91,3 +91,12 @@ export async function getKnowledgeFiles(fileType?: string, skip = 0, limit = 100
         throw error
       })
 }
+
+export async function getKnowledgeFile(filename: string){
+    return axios.get(`${BASE_URL}/getFile/${filename}`).then((response: any) => {
+        return response.data;
+    }).catch((error: any) => {
+        console.error("Error in getKnowledgeFile:", error);
+        throw error;
+    });
+}

@@ -219,6 +219,13 @@
                   </div>
 
                   <div class="flex items-center space-x-2">
+                    <button
+                        @click="viewFile(file)"
+                        class="text-gray-400 hover:text-green-600 transition-colors"
+                        title="查看文件内容"
+                    >
+                      <Eye class="h-4 w-4" />
+                    </button>
                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                           :class="getFileTypeStyle(file.file_type || 'unknown', true)">
                       {{ file.entry_count || 0 }}
@@ -240,14 +247,21 @@
       :details="uploadSuccessDetails"
       @hide="showUploadSuccess = false"
   />
+
+  <!-- 文件查看器 -->
+  <FileViewerModal
+      :isOpen="showFileViewer"
+      :file="selectedFileForViewing"
+      @close="closeFileViewer"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
   X, Upload, Check, RefreshCw, Database,
   FileText, Pill, Heart, HelpCircle,
-  File, FileSpreadsheet, Code
+  File, FileSpreadsheet, Code, Eye
 } from 'lucide-vue-next';
 import {
   getKnowledgeFiles,
@@ -257,6 +271,7 @@ import {
 } from '../../api/KnowledgeComponents';
 import type { KnowledgeFileResponse } from '../../models/KnowledgeFileModel';
 import UploadSuccessToast from '../common/UploadSuccessToast.vue';
+import FileViewerModal from './FileViewerModal.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -315,6 +330,10 @@ const uploadSuccessDetails = ref<{
   knowledgeType: string;
   entryCount: number;
 } | undefined>(undefined);
+
+// 文件查看器相关状态
+const showFileViewer = ref(false);
+const selectedFileForViewing = ref<KnowledgeFileResponse | null>(null);
 
 // 计算属性
 const filteredFiles = computed(() => {
@@ -574,12 +593,12 @@ const startUpload = async () => {
   }
 };
 
-// 加载文件列表
+// 加载文件列表 - 修复计数问题，始终加载所有文件
 const loadFiles = async () => {
   isLoading.value = true;
   try {
-    const fileType = activeTab.value === 'all' ? undefined : activeTab.value;
-    files.value = await getKnowledgeFiles(fileType, 0, 1000);
+    // 始终加载所有文件，不进行服务端过滤
+    files.value = await getKnowledgeFiles(undefined, 0, 1000);
   } catch (error) {
     console.error('加载文件列表失败:', error);
   } finally {
@@ -597,10 +616,17 @@ const closeModal = () => {
   emit('close');
 };
 
-// 监听标签页变化
-watch(activeTab, () => {
-  loadFiles();
-});
+// 查看文件内容
+const viewFile = (file: KnowledgeFileResponse) => {
+  selectedFileForViewing.value = file;
+  showFileViewer.value = true;
+};
+
+// 关闭文件查看器
+const closeFileViewer = () => {
+  showFileViewer.value = false;
+  selectedFileForViewing.value = null;
+};
 
 // 页面加载时获取文件列表
 onMounted(() => {
@@ -637,4 +663,3 @@ onMounted(() => {
   background: #94a3b8;
 }
 </style>
-
