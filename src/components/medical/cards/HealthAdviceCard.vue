@@ -55,7 +55,7 @@
 import { ref } from 'vue';
 import { RefreshCw, Bot, User } from 'lucide-vue-next';
 import {useReportStore} from "../../../stores/reportStore.ts";
-import {generateMedicalAdviceResponse} from "../../../api/ReportComponents.ts";
+import {generateHealthyAdviceResponse} from "../../../api/ReportComponents.ts";
 
 const isGenerating = ref(false);
 const aiAdvice = ref('');
@@ -65,7 +65,7 @@ const reportStore = useReportStore();
 const generateAdvice = async () => {
   isGenerating.value = true;
   try {
-    aiAdvice.value = await generateMedicalAdviceResponse(reportStore, additionalRequirement.value);
+    aiAdvice.value = await generateHealthyAdviceResponse(reportStore, additionalRequirement.value);
   } finally {
     isGenerating.value = false;
   }

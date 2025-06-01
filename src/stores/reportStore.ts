@@ -18,7 +18,7 @@ export const useReportStore = defineStore("report",{
     }),
     actions: {
         getPatientInfoPrompt(): string {
-            return `患者年龄：${this.patientAge}，患者性别：${this.patientGender}，过往病史：${this.medicalHistory}`;
+            return `患者年龄：${this.patientAge}\n患者性别：${this.patientGender}\n过往病史：${this.medicalHistory}\n症状描述：===${this.symptomsDescription}===`;
         }
     },
     persist: true,

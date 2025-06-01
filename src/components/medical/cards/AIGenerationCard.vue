@@ -66,7 +66,11 @@
 import { ref } from 'vue';
 import { Bot, Sparkles, RefreshCw } from 'lucide-vue-next';
 import { useReportStore } from "../../../stores/reportStore.ts";
-import {generateMedicalLogicResponse, generateMedicalRecommendationResponse} from "../../../api/ReportComponents.ts";
+import {
+  generateHealthyAdviceResponse,
+  generateMedicalLogicResponse,
+  generateMedicalRecommendationResponse
+} from "../../../api/ReportComponents.ts";
 
 const reportStore = useReportStore();
 const isGenerating = ref(false);
@@ -98,7 +102,7 @@ const generateAllRecommendations = async () => {
 
     // 步骤3：生成保健建议
     currentStep.value = 3;
-    reportStore.healthAdvice = await generateMedicalRecommendationResponse(reportStore, additionalRequirement.value);
+    reportStore.healthAdvice = await generateHealthyAdviceResponse(reportStore, additionalRequirement.value);
 
   } finally {
     isGenerating.value = false;

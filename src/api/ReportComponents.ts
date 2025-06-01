@@ -2,11 +2,10 @@ import {ragQueryForDrugAdvise, ragQueryForDrugLogic, ragQueryForHealthAdvice} fr
 import type {ReportStore} from "../stores/reportStore.ts";
 
 
-export async function generateMedicalAdviceResponse(reportStore : ReportStore, doctorRequirement = '') {
+export async function generateHealthyAdviceResponse(reportStore : ReportStore, doctorRequirement = '') {
     const prompt = "患者信息：" + reportStore.getPatientInfoPrompt() + "\n" +
         "医生要求：" + doctorRequirement + "\n" +
         "请根据以上信息生成保健建议。";
-
     return await ragQueryForHealthAdvice(prompt);
 }
 
@@ -15,6 +14,7 @@ export async function generateMedicalRecommendationResponse(reportStore : Report
         +"医生要求:" + doctorRequirement + "\n"
         +"请根据患者情况和医生要求生成严谨、合理、友善的开药建议" + "\n"
     ;
+    console.log(prompt)
     return await ragQueryForDrugAdvise(prompt);
 }
 
