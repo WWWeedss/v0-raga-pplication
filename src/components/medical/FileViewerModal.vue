@@ -116,10 +116,23 @@
                           class="hover:bg-blue-50 transition-colors duration-150"
                           :class="{ 'bg-gray-50': rowIndex % 2 === 1 }">
                         <td v-for="(cell, cellIndex) in row" :key="cellIndex"
-                            class="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0 align-top"
-                            :class="getColumnWidthClass(cellIndex)">
+                            class="px-4 py-3 text-sm border-r border-gray-200 last:border-r-0 align-top"
+                            :class="[getColumnWidthClass(cellIndex), cellIndex === 1 && rowIndex > 0 ? 'text-blue-600' : 'text-gray-900']">
                           <div class="relative group">
-                            <div class="truncate" :title="cell || ''"
+                            <!-- 第二列（索引为1）且不是标题行的单元格设置为链接样式 -->
+                            <div v-if="cellIndex === 1 && cell" class="truncate" :title="cell || ''">
+                              <a 
+                                v-if="rowIndex > 0" 
+                                href="javascript:void(0)" 
+                                class="hover:underline text-blue-600"
+                                @click.prevent="handleLinkClick(cell)"
+                              >
+                                {{ cell || '暂无数据' }}
+                              </a>
+                              <span v-else>{{ cell || '暂无数据' }}</span>
+                            </div>
+                            <!-- 其他列保持原样 -->
+                            <div v-else class="truncate" :title="cell || ''"
                                  :class="{ 'text-gray-400 italic': !cell }">
                               {{ cell || '暂无数据' }}
                             </div>
@@ -199,6 +212,11 @@
 
             <!-- CSV 格式 -->
             <div v-else-if="isCsvFile" class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="text-sm text-gray-600 mr-4">
+                  共 {{ csvHeaders.length }} 列，{{ csvRows.length }} 行数据
+                </div>
+              </div>
               <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
                   <thead class="bg-gray-50">
@@ -212,8 +230,16 @@
                   <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-for="(row, rowIndex) in csvRows.slice(0, 100)" :key="rowIndex" class="hover:bg-gray-50">
                     <td v-for="(cell, cellIndex) in row" :key="cellIndex"
-                        class="px-4 py-2 text-sm text-gray-900 border-r border-gray-200 last:border-r-0 max-w-xs truncate">
-                      {{ cell }}
+                        class="px-4 py-2 text-sm border-r border-gray-200 last:border-r-0 max-w-xs truncate"
+                        :class="cellIndex === 1 && rowIndex > 0 ? 'text-blue-600' : 'text-gray-900'">
+                      <!-- 第二列（索引为1）且不是标题行的单元格设置为链接样式 -->
+                      <a v-if="cellIndex === 1 && cell && rowIndex > 0" 
+                         href="javascript:void(0)" 
+                         class="hover:underline text-blue-600"
+                         @click.prevent="handleLinkClick(cell)">
+                        {{ cell }}
+                      </a>
+                      <span v-else>{{ cell }}</span>
                     </td>
                   </tr>
                   </tbody>
@@ -408,7 +434,7 @@ const parseCsvContent = (content: string) => {
   );
 };
 
-// 解析 XLSX ��容 - 处理新的分隔符格式
+// 解析 XLSX 内容 - 处理新的分隔符格式
 const parseXlsxContent = (content: string) => {
   try {
     // 重置数据
@@ -656,6 +682,34 @@ const getContentContainerClass = () => {
   }
   // 其他文件类型保持原有的固定高度
   return 'h-[50vh] overflow-y-auto';
+};
+
+// 处理链接点击
+const handleLinkClick = (cell: string) => {
+  // 检查是否是有效URL
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // 如果是有效URL，直接打开链接
+  if (isValidUrl(cell)) {
+    window.open(cell, '_blank', 'noopener,noreferrer');
+  } else {
+    // 如果不是有效URL，复制内容
+    navigator.clipboard.writeText(cell)
+      .then(() => {
+        showToast?.('链接内容已复制到剪贴板', 'success');
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+        showToast?.('复制失败', 'dislike');
+      });
+  }
 };
 </script>
 
