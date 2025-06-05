@@ -50,7 +50,7 @@
             <!-- 文件上传区域 -->
             <div class="space-y-4">
               <div class="text-xs text-gray-500 text-center">
-                支持格式：.txt, .csv, .json, .xlsx
+                支持格式：.txt, .csv, .json, .xlsx, .pdf
               </div>
 
               <!-- 拖拽上传区域 -->
@@ -103,7 +103,7 @@
                     ref="fileInput"
                     type="file"
                     class="hidden"
-                    accept=".txt,.csv,.json,.xlsx"
+                    accept=".txt,.csv,.json,.xlsx,.pdf"
                     @change="handleFileSelect"
                 />
               </div>
@@ -261,7 +261,8 @@ import { ref, computed, onMounted } from 'vue';
 import {
   X, Upload, Check, RefreshCw, Database,
   FileText, Pill, Heart, HelpCircle,
-  File, FileSpreadsheet, Code, Eye
+  File, FileSpreadsheet, Code, Eye,
+  FileType
 } from 'lucide-vue-next';
 import {
   getKnowledgeFiles,
@@ -354,6 +355,8 @@ const getFileIcon = (fileName: string) => {
       return FileSpreadsheet;
     case 'json':
       return Code;
+    case 'pdf':
+      return FileType;
     default:
       return File;
   }
@@ -370,6 +373,8 @@ const getFileIconColor = (fileName: string) => {
       return 'text-green-600';
     case 'json':
       return 'text-purple-600';
+    case 'pdf':
+      return 'text-red-600';
     default:
       return 'text-gray-600';
   }
@@ -448,8 +453,14 @@ const formatDate = (dateString: string) => {
 
 // 验证文件类型
 const validateFile = (file: File): boolean => {
-  const allowedTypes = ['text/plain', 'text/csv', 'application/json', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-  const allowedExtensions = ['.txt', '.csv', '.json', '.xlsx'];
+  const allowedTypes = [
+    'text/plain', 
+    'text/csv', 
+    'application/json', 
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/pdf'
+  ];
+  const allowedExtensions = ['.txt', '.csv', '.json', '.xlsx', '.pdf'];
 
   const isValidType = allowedTypes.includes(file.type);
   const isValidExtension = allowedExtensions.some(ext =>
@@ -503,7 +514,7 @@ const processFile = (file: File) => {
 
   // 验证文件类型
   if (!validateFile(file)) {
-    errorMessage.value = '请选择支持的文件格式：.txt, .csv, .json, .xlsx';
+    errorMessage.value = '请选择支持的文件格式：.txt, .csv, .json, .xlsx, .pdf';
     return;
   }
 
