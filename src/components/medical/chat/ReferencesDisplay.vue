@@ -56,8 +56,9 @@
               <div
                   class="text-gray-200"
                   :class="{ 'line-clamp-3': !expandedRefs.has(index) }"
+                  style="white-space: pre-line;"
               >
-                {{ reference.metadata.response }}
+                {{ formatResponseText(reference.metadata.response) }}
               </div>
 
               <!-- Expand/Collapse for long content -->
@@ -94,6 +95,12 @@ const sortedReferences = computed(() => {
   return [...props.references].sort((a, b) => b.score - a.score);
 });
 
+// 处理文本中的"==="符号，将其作为换行符处理并删除
+const formatResponseText = (text: string) => {
+  if (!text) return '';
+  return text.split('===').join('\n');
+};
+
 const toggleReferences = () => {
   showReferences.value = !showReferences.value;
 };
@@ -111,9 +118,9 @@ const copyReference = async (reference: source_document) => {
     // 根据是否有 query 来构建复制内容
     let content = '';
     if (reference.metadata.query && reference.metadata.query.trim()) {
-      content = `问题: ${reference.metadata.query}\n\n回答: ${reference.metadata.response}`;
+      content = `问题: ${reference.metadata.query}\n\n回答: ${formatResponseText(reference.metadata.response)}`;
     } else {
-      content = `参考内容: ${reference.metadata.response}`;
+      content = `参考内容: ${formatResponseText(reference.metadata.response)}`;
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
